@@ -41,7 +41,11 @@ class PillTabs extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: isActive ? AppColors.white : AppColors.primary,
+                    color: isActive
+                        ? AppColors.white
+                        : (AppColors.isDark
+                            ? AppColors.textPrimary
+                            : AppColors.primary),
                     fontWeight: FontWeight.w600,
                   ),
                 ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
+import '../controllers/settings_controller.dart';
 
 /// Surah list row: numbered circle, English name, trailing Arabic name.
 class SurahTileCard extends StatelessWidget {
@@ -27,65 +29,68 @@ class SurahTileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(16.r),
-      child: InkWell(
-        onTap: onTap,
+    return Obx(() {
+      Get.find<SettingsController>().isDarkMode.value;
+      return Material(
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16.r),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.04),
-                blurRadius: 12.r,
-                offset: Offset(0, 4.h),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              _NumberCircle(number: number, isActive: isActive),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      englishName,
-                      style: AppTextStyles.heading3,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (_subtitle != null) ...[
-                      SizedBox(height: 2.h),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16.r),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.04),
+                  blurRadius: 12.r,
+                  offset: Offset(0, 4.h),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                _NumberCircle(number: number, isActive: isActive),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        _subtitle!,
-                        style: AppTextStyles.bodySmall,
+                        englishName,
+                        style: AppTextStyles.heading3,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (_subtitle != null) ...[
+                        SizedBox(height: 2.h),
+                        Text(
+                          _subtitle!,
+                          style: AppTextStyles.bodySmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              SizedBox(width: 8.w),
-              Flexible(
-                child: Text(
-                  arabicName,
-                  style: AppTextStyles.arabicTitle,
-                  textDirection: TextDirection.rtl,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                SizedBox(width: 8.w),
+                Flexible(
+                  child: Text(
+                    arabicName,
+                    style: AppTextStyles.arabicTitle,
+                    textDirection: TextDirection.rtl,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   String? get _subtitle {

@@ -4,6 +4,7 @@ import '../../screens/bookmarks/bookmarks_screen.dart';
 import '../../screens/main/main_binding.dart';
 import '../../screens/main/main_navigation_screen.dart';
 import '../../screens/mushaf/mushaf_binding.dart';
+import '../../screens/mushaf/mushaf_controller.dart';
 import '../../screens/mushaf/mushaf_screen.dart';
 import '../../screens/onboarding/onboarding_binding.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
@@ -50,7 +51,9 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.mushaf,
-      page: () => const MushafScreen(),
+      page: () => MushafScreen(
+        initialPage: MushafController.resolveInitialPage(Get.arguments),
+      ),
       binding: MushafBinding(),
     ),
   ];

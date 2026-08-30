@@ -95,7 +95,11 @@ class AudioService extends GetxService {
     }
   }
 
-  Future<void> pause() => _audio.pause();
+  Future<void> pause() async {
+    try {
+      await _audio.pause();
+    } catch (_) {}
+  }
 
   Future<void> resume() => _audio.play();
 

@@ -1,11 +1,13 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '../data/json_utils.dart';
 import '../data/models/last_read.dart';
 import '../data/offline_translations.dart';
 
 class StorageService extends GetxService {
   static const lastReadKey = 'last_read';
+  static const mushafLastPageKey = 'mushaf_last_page';
   static const bookmarksKey = 'bookmarks';
   static const reciterIdKey = 'selected_reciter_id';
   static const reciterNameKey = 'selected_reciter_name';
@@ -67,13 +69,45 @@ class StorageService extends GetxService {
 
   LastRead? getLastRead() => lastRead.value;
 
+  int get lastMushafPage {
+    final stored = _box.read(mushafLastPageKey);
+    if (stored != null) {
+      return asInt(stored, fallback: 1).clamp(1, 604);
+    }
+    final page = lastRead.value?.mushafPage;
+    if (page != null && page > 0) return page.clamp(1, 604);
+    return 1;
+  }
+
   Future<void> saveLastRead({
     required int surahNumber,
     required int ayahNumber,
+    String source = LastRead.sourceSurah,
+    int? mushafPage,
   }) async {
-    final value = LastRead(surahNumber: surahNumber, ayahNumber: ayahNumber);
+    final value = LastRead(
+      surahNumber: surahNumber,
+      ayahNumber: ayahNumber,
+      source: source,
+      mushafPage: source == LastRead.sourceMushaf ? mushafPage : null,
+    );
     lastRead.value = value;
     await _box.write(lastReadKey, value.toJson());
+  }
+
+  Future<void> saveMushafLastPage({
+    required int page,
+    int surahNumber = 1,
+    int ayahNumber = 1,
+  }) async {
+    final clamped = page.clamp(1, 604);
+    await _box.write(mushafLastPageKey, clamped);
+    await saveLastRead(
+      surahNumber: surahNumber,
+      ayahNumber: ayahNumber,
+      source: LastRead.sourceMushaf,
+      mushafPage: clamped,
+    );
   }
 
   List<int> getBookmarks() => List<int>.from(bookmarks);

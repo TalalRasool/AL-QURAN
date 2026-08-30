@@ -45,8 +45,9 @@ class AppBottomNav extends StatelessWidget {
             children: List.generate(items.length, (index) {
               final item = items[index];
               final isActive = index == currentIndex;
-              final color =
-                  isActive ? AppColors.primary : AppColors.textSecondary;
+              final color = isActive
+                  ? (AppColors.isDark ? AppColors.white : AppColors.primary)
+                  : AppColors.textSecondary;
 
               return Expanded(
                 child: InkWell(

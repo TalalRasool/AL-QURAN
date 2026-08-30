@@ -23,11 +23,11 @@ class AppTheme {
   static ThemeData get dark {
     return _build(
       brightness: Brightness.dark,
-      scaffold: const Color(0xFF0C1410),
-      surface: const Color(0xFF15201A),
+      scaffold: const Color(0xFF000000),
+      surface: const Color(0xFF121212),
       onSurface: const Color(0xFFF4F7F5),
-      fill: const Color(0xFF1A2620),
-      divider: const Color(0xFF2A3A32),
+      fill: const Color(0xFF1A1A1A),
+      divider: const Color(0xFF2E2E2E),
       statusIcons: Brightness.light,
     );
   }
