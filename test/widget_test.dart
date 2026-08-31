@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:alquran/core/services/app_services.dart';
 import 'package:alquran/core/services/storage_service.dart';
@@ -10,6 +11,7 @@ import 'package:alquran/main.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   setUp(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -40,6 +42,7 @@ void main() {
 
     await tester.pumpWidget(const AlQuranApp());
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.byType(GetMaterialApp), findsOneWidget);
     expect(find.text('Assalamu Alaikum'), findsOneWidget);
