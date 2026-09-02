@@ -83,6 +83,9 @@ flutter:
     - assets/data/
     - assets/databases/
     - assets/json/
+    - assets/json/seerah.json
+    - assets/json/sahaba.json
+    - assets/json/ghazawat.json
 
 flutter_launcher_icons:
   android: "launcher_icon"

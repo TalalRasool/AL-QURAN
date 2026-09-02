@@ -1,0 +1,394 @@
+[
+  {
+    "chapter_id": 1,
+    "title": {
+      "en": "Ghazwah Badr",
+      "ur": "غزوہ بدر",
+      "hi": "ग़ज़वा-ए-बद्र",
+      "bn": "গাজওয়ায়ে বদর",
+      "id": "Perang Badar"
+    },
+    "heading": {
+      "en": "2 AH / 624 CE",
+      "ur": "2ھ / 624ء",
+      "hi": "2 हिजरी / 624 ई",
+      "bn": "২ হিজরি / ৬২৪ খ্রি.",
+      "id": "2 H / 624 M"
+    },
+    "details": {
+      "en": "Badr was the first major pitched battle. About 313 Muslims, lightly armed, met a Quraysh caravan-relief force of around one thousand at the wells of Badr, southwest of Madinah. Allah promised angels and a clear victory (8:9–12). Leaders of Quraysh such as Abu Jahl fell. Fourteen Muslims were martyred. The victory confirmed the new community and is called Yawm al-Furqan, the Day of Criterion (8:41).",
+      "ur": "بدر پہلی بڑی صف آراء جنگ۔ تقریباً 313 ہلکے مسلح مسلمان مدینہ کے جنوب مغرب کنوؤں پر قریش کی تقریباً ہزار نفری سے ٹکرائے۔ اللہ نے فرشتوں اور فتح مبین کا وعدہ کیا (8:9–12)۔ ابو جہل جیسے سردار گرے۔ چودہ مسلمان شہید۔ یہ فتح یوم الفرقان کہلائی (8:41)۔",
+      "hi": "बद्र पहली बड़ी जंग। करीब 313 मुसलमान लगभग हज़ार कुरैश से टकराए। अल्लाह ने फतह का वादा किया। चौदह शहीद। यौमुल फुरक़ान कही गई।",
+      "bn": "বদর প্রথম বড় সম্মুখ যুদ্ধ। প্রায় ৩১৩ মুসলিম প্রায় এক হাজার কুরাইশের মুখোমুখি হন। আল্লাহ বিজয়ের ওয়াদা করেন। চৌদ্দজন শহীদ। একে ইয়াওমুল ফুরকান বলা হয়।",
+      "id": "Badar pertempuran besar pertama. Sekitar 313 muslim menghadapi sekitar seribu Quraisy. Allah menjanjikan kemenangan. Empat belas syahid. Disebut Yaumul Furqan."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "The army and the outcome",
+          "ur": "لشکر اور انجام",
+          "hi": "लश्कर और अंजाम",
+          "bn": "সেনা ও পরিণতি",
+          "id": "Pasukan dan hasil"
+        },
+        "heading": {
+          "en": "First great battle",
+          "ur": "پہلی بڑی جنگ",
+          "hi": "पहली बड़ी जंग",
+          "bn": "প্রথম বড় যুদ্ধ",
+          "id": "Pertempuran besar pertama"
+        },
+        "details": {
+          "en": "The Prophet ﷺ consulted the Muhajirun and Ansar; Sa'd ibn Mu'adh spoke for the Ansar's loyalty. Rain fell, the Muslims held the wells, and du'a was made until the coat of mail fell from the Prophet's ﷺ shoulders. Captives were treated with mercy; some were freed for teaching literacy. The spoils were distributed by revelation in Surah al-Anfal.",
+          "ur": "نبی ﷺ نے مہاجرین و انصار سے مشورہ کیا؛ سعد بن معاذ نے انصار کی وفا بیان کی۔ بارش ہوئی، کنویں مسلمانوں کے پاس رہے، دعا یہاں تک کہ زرہ آپ کے کندھوں سے سرک گئی۔ قیدیوں سے رحم، بعض نے لکھنا پڑھا کر آزادی پائی۔ مال غنیمت سورہ انفال کی وحی سے تقسیم ہوا۔",
+          "hi": "नबी ﷺ ने मुशविरा किया। साद बिन मुआज़ ने अनसार की वफ़ा कही। क़ैदियों पर रहम। माले ग़नीमत अनफ़ाल से बांटा गया।",
+          "bn": "নবী ﷺ পরামর্শ করেন। সাদ ইবন মুআয আনসারের আনুগত্য বলেন। বন্দিদের প্রতি দয়া। গনিমত সূরা আনফাল অনুসারে বণ্টিত হয়।",
+          "id": "Nabi ﷺ bermusyawarah; Sa'd bin Mu'az menyatakan setia Ansar. Tawanan diperlakukan lembut. Ganimah dibagi menurut Surah al-Anfal."
+        }
+      }
+    ]
+  },
+  {
+    "chapter_id": 2,
+    "title": {
+      "en": "Ghazwah Uhud",
+      "ur": "غزوہ احد",
+      "hi": "ग़ज़वा-ए-उहुद",
+      "bn": "গাজওয়ায়ে উহুদ",
+      "id": "Perang Uhud"
+    },
+    "heading": {
+      "en": "3 AH / 625 CE",
+      "ur": "3ھ / 625ء",
+      "hi": "3 हिजरी / 625 ई",
+      "bn": "৩ হিজরি / ৬২৫ খ্রি.",
+      "id": "3 H / 625 M"
+    },
+    "details": {
+      "en": "Quraysh returned with about three thousand to avenge Badr. The Muslims, about seven hundred after a withdrawal by Abdullah ibn Ubayy, took positions at Mount Uhud. Archers were posted on a flank with orders not to leave. When they left their post after an early success, Khalid ibn al-Walid's cavalry struck. The Prophet ﷺ was wounded, rumours spread that he had been killed, and about seventy were martyred, including Hamzah. Uhud was a trial teaching obedience and patience (3:139–165).",
+      "ur": "قریش بدر کا بدلہ لینے تقریباً تین ہزار لے کر آئے۔ عبد اللہ بن ابی کے واپس ہونے کے بعد مسلمان تقریباً سات سو احد پہاڑ پر مورچے باندھے۔ تیراندازوں کو پہलू پر حکم تھا نہ ہٹیں۔ ابتدائی کامیابی پر مورچہ چھوڑنے سے خالد کی گھڑسوار نے وار کیا। نبی ﷺ زخمی، شہادت کی افواہ، تقریباً ستر شہید بشمول حمزہ۔ احد اطاعت اور صبر کی آزمائش تھی (3:139–165)۔",
+      "hi": "कुरैश ने बद्र का बदला लिया। तीरंदाज़ों ने मोर्चा छोड़ा तो ख़ालिद की घुड़सवार ने हमला किया। नबी ﷺ ज़ख़्मी, हमज़ा शहीद। उहुद इताअत की आज़माइश।",
+      "bn": "কুরাইশ বদরের প্রতিশোধে আসে। তীরন্দাজরা অবস্থান ছাড়লে খালিদের অশ্বারোহী আঘাত করে। নবী ﷺ আহত, হামজাহ শহীদ। উহুদ আনুগত্যের পরীক্ষা।",
+      "id": "Quraisy membalas Badar. Pemanah meninggalkan pos, kavaleri Khalid menyerang. Nabi ﷺ terluka, Hamzah syahid. Uhud adalah ujian ketaatan."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "The archers' hill",
+          "ur": "تیراندازوں کی پہاڑی",
+          "hi": "तीरंदाज़ों की पहाड़ी",
+          "bn": "তীরন্দাজদের পাহাড়",
+          "id": "Bukit pemanah"
+        },
+        "heading": {
+          "en": "A lesson in obedience",
+          "ur": "اطاعت کا سبق",
+          "hi": "इताअत की सबक",
+          "bn": "আনুগত্যের শিক্ষা",
+          "id": "Pelajaran ketaatan"
+        },
+        "details": {
+          "en": "The Prophet ﷺ placed about fifty archers under Abdullah ibn Jubayr and forbade them to leave even if they saw the Muslims winning. Many descended to collect spoils. The reversal followed at once. Those who stood firm, and those who rallied around the Prophet ﷺ when he called, are praised in the Quran.",
+          "ur": "نبی ﷺ نے عبد اللہ بن جبیر کے تحت تقریباً پچاس تیرانداز رکھے اور منع کیا کہ فتح دیکھ کر بھی نہ ہٹیں۔ بہت غنیمت کے لیے اترے۔ الٹ فوراً ہوا۔ جو جمے رہے اور پکار پر آپ کے گرد اکٹھے ہوئے قرآن میں تعریف کیے گئے।",
+          "hi": "नबी ﷺ ने पचास तीरंदाज़ रखे, मना किया हटना। कई ग़नीमत को उतरे। जो डटे रहे उनकी तारीफ़ कुरआन में है।",
+          "bn": "নবী ﷺ প্রায় পঞ্চাশ তীরন্দাজ রাখেন, সরতে নিষেধ করেন। অনেকে গনিমত নিতে নামেন। যারা স্থির থাকেন কুরআনে প্রশংসিত।",
+          "id": "Nabi ﷺ menempatkan sekitar lima puluh pemanah, dilarang turun. Banyak turun mengambil ganimah. Yang tetap bertahan dipuji Al-Qur'an."
+        }
+      }
+    ]
+  },
+  {
+    "chapter_id": 3,
+    "title": {
+      "en": "Ghazwah al-Khandaq (Ahzab)",
+      "ur": "غزوہ خندق (احزاب)",
+      "hi": "ग़ज़वा-ए-खंदक (अहज़ाब)",
+      "bn": "গাজওয়ায়ে খন্দক (আহজাব)",
+      "id": "Perang Khandaq (Ahzab)"
+    },
+    "heading": {
+      "en": "5 AH / 627 CE",
+      "ur": "5ھ / 627ء",
+      "hi": "5 हिजरी / 627 ई",
+      "bn": "৫ হিজরি / ৬২৭ খ্রি.",
+      "id": "5 H / 627 M"
+    },
+    "details": {
+      "en": "A confederacy of Quraysh, Ghatafan, and other tribes, urged on after the exile of Banu Nadir, besieged Madinah with thousands. Salman al-Farisi suggested digging a trench on the open approach. The siege lasted weeks in cold and hunger. Nu'aym ibn Mas'ud sowed distrust among the allies. Allah sent wind and the coalition broke (33:9–25). The battle is named Ahzab (the Confederates) in the Quran.",
+      "ur": "بنو نضیر کی جلاوطنی کے بعد قریش، غطفان اور دیگر قبائل کے ہزاروں نے مدینہ گھیر لیا। سلمان فارسی نے کھلے رخ پر خندق کھودنے کو کہا۔ محاصرہ ہفتوں چلا، سردی اور بھوک۔ نعیم بن مسعود نے اتحادیوں میں بدگمانی ڈالی۔ اللہ نے ہوا بھیجی اور اتحاد ٹوٹا (33:9–25)۔ قرآن میں احزاب ہے۔",
+      "hi": "कुरैश और गतफ़ान ने मदीना घेरा। सल्मान ने खंदक सुझाई। अल्लाह ने हवा भेजी, गठबंधन टूटा। कुरआन में अहज़ाब।",
+      "bn": "কুরাইশ ও গাতাফান মদিনা অবরোধ করে। সালমান পরিখা প্রস্তাব করেন। আল্লাহ বায়ু পাঠান, জোট ভেঙে যায়। কুরআনে আহজাব।",
+      "id": "Koalisi Quraisy dan Gathafan mengepung Madinah. Salman mengusulkan parit. Allah mengirim angin, koalisi pecah. Al-Qur'an menamainya Ahzab."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "The siege and Banu Qurayzah",
+          "ur": "محاصرہ اور بنو قریظہ",
+          "hi": "घेराबंदी और बनू कुरैज़ा",
+          "bn": "অবরোধ ও বনু কুরায়জা",
+          "id": "Pengepungan dan Bani Quraizah"
+        },
+        "heading": {
+          "en": "After the trench",
+          "ur": "خندق کے بعد",
+          "hi": "खंदक के बाद",
+          "bn": "খন্দকের পর",
+          "id": "Setelah parit"
+        },
+        "details": {
+          "en": "During the siege, Banu Qurayzah were accused of breaking their pact with the Prophet ﷺ under pressure from Huyayy ibn Akhtab. After the confederates left, the Muslims besieged Banu Qurayzah. They accepted the judgment of Sa'd ibn Mu'adh, who ruled by the law of their scripture regarding combatants who break a wartime treaty. The episode is reported in the seerah and Surah al-Ahzab.",
+          "ur": "محاصرے میں بنو قریظہ پر الزام ہے کہ حیي بن اخطب کے دباؤ پر نبی ﷺ سے عہد توڑا۔ احزاب کے جانے کے بعد محاصرہ ہوا۔ انہوں نے سعد بن معاذ کا فیصلہ ماننا قبول کیا جنہوں نے ان کی کتاب کی جنگ کے عہد توڑنے والے جنگجوؤں والی سزا دی। یہ سیرت اور سورہ احزاب میں ہے۔",
+          "hi": "घेरे में बनू कुरैज़ा पर इल्ज़ाम कि उन्होंने अहद तोड़ा। साद बिन मुआज़ का फैसला माना। यह सीरत और सूरह अहज़ाब में है।",
+          "bn": "অবরোধে বনু কুরায়জার বিরুদ্ধে অভিযোগ তাঁরা চুক্তি ভঙ্গ করেন। সাদ ইবন মুআযের রায় তাঁরা মানেন। এটি সিরাত ও সূরা আহজাবে আছে।",
+          "id": "Dalam pengepungan, Bani Quraizah dituduh merusak perjanjian. Mereka menerima keputusan Sa'd bin Mu'az. Peristiwa ini ada dalam sirah dan Surah al-Ahzab."
+        }
+      }
+    ]
+  },
+  {
+    "chapter_id": 4,
+    "title": {
+      "en": "Ghazwah Khaybar",
+      "ur": "غزوہ خیبر",
+      "hi": "ग़ज़वा-ए-ख़ैबर",
+      "bn": "গাজওয়ায়ে খাইবার",
+      "id": "Perang Khaibar"
+    },
+    "heading": {
+      "en": "7 AH / 628 CE",
+      "ur": "7ھ / 628ء",
+      "hi": "7 हिजरी / 628 ई",
+      "bn": "৭ হিজরি / ৬২৮ খ্রি.",
+      "id": "7 H / 628 M"
+    },
+    "details": {
+      "en": "After Hudaybiyyah, the Prophet ﷺ marched on Khaybar, a cluster of fortified oases north of Madinah inhabited by Jewish tribes, some of whom had allied against Madinah. The Muslims took the fortresses one by one. Ali ibn Abi Talib distinguished himself at the fortress of Qamus after the Prophet ﷺ said the standard would go to one who loves Allah and His Messenger. Khaybar agreed to remain and farm, giving a share of the produce (kharaj/half the dates). The poisoned sheep of Zaynab bint al-Harith is reported from this campaign.",
+      "ur": "حدیبیہ کے بعد نبی ﷺ خیبر گئے، مدینہ کے شمال قلعے دار نخلستان، یہودی قبائل جن میں سے بعض نے مدینہ کے خلاف گٹھ جوڑ کیا تھا۔ قلعے ایک ایک کر کے فتح ہوئے۔ علی نے قموص پر نمایاں کردار ادا کیا جب نبی ﷺ نے فرمایا جھنڈا اس کے ہاتھ جسے اللہ اور اس کا رسول محبوب ہیں۔ خیبر رہ کر کھیتی پر راضی، پیداوار کا حصہ۔ زینب بنت حارث کی زہریلی بکری اسی مہم سے مروی ہے۔",
+      "hi": "हुदैबिया के बाद ख़ैबर पर चढ़ाई। क़िले एक-एक कर फतह। अली ने क़ामूस पर झंडा उठाया। ख़ैबर खेती पर रहा, पैदावार का हिस्सा देना माना।",
+      "bn": "হুদায়বিয়ার পর খাইবার অভিযান। দুর্গ একের পর এক বিজিত। আলী কামুস দুর্গে পতাকা তোলেন। খাইবার চাষে থেকে ফসলের অংশ দিতে রাজি হয়।",
+      "id": "Setelah Hudaibiyah, Nabi ﷺ menuju Khaibar, oasis berbenteng. Benteng jatuh satu per satu. Ali menonjol di Qamus. Khaibar tetap bertani dengan bagi hasil."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "The standard and the treaty",
+          "ur": "جھنڈا اور معاہدہ",
+          "hi": "झंडा और मुआहिदा",
+          "bn": "পতাকা ও চুক্তি",
+          "id": "Bendera dan perjanjian"
+        },
+        "heading": {
+          "en": "After Hudaybiyyah",
+          "ur": "حدیبیہ کے بعد",
+          "hi": "हुदैबिया के बाद",
+          "bn": "হুদায়বিয়ার পর",
+          "id": "Setelah Hudaibiyah"
+        },
+        "details": {
+          "en": "Abu Bakr and Umar carried the standard on successive days without a decisive breach; then Ali, who had been left behind with eye inflammation, was called, his eyes treated, and he killed Marhab according to famous reports. Safiyyah bint Huyayy was later married by the Prophet ﷺ. Khaybar's arrangement became a model for later land treaties.",
+          "ur": "ابو بکر اور عمر نے لگاتار دن جھنڈا اٹھایا بغیر فیصلہ کن فتح؛ پھر علی جو آنکھ کی تکلیف سے پیچھے تھے بلائے گئے، آنکھوں کا علاج ہوا، مشہور روایت کے مطابق مرحب کو قتل کیا۔ صفیہ بنت حیي سے بعد میں نکاح ہوا। خیبر کا بندوبست بعد کے زمینی معاہدوں کی مثال بنا।",
+          "hi": "अबू बक्र और उमर ने झंडा उठाया; फिर अली बुलाए गए। सफ़िया से बाद निकाह। ख़ैबर का बंदोबस्त बाद के मुआहिदों की मिसाल बना।",
+          "bn": "আবু বকর ও উমর পতাকা তোলেন; পরে আলী আহূত হন। সাফিয়্যাহর সঙ্গে পরে বিবাহ হয়। খাইবারের ব্যবস্থা পরবর্তী ভূমিচুক্তির আদর্শ হয়।",
+          "id": "Abu Bakar dan Umar membawa bendera; lalu Ali dipanggil. Safiyyah kemudian dinikahi Nabi ﷺ. Tata Khaibar menjadi model perjanjian tanah."
+        }
+      }
+    ]
+  },
+  {
+    "chapter_id": 5,
+    "title": {
+      "en": "Ghazwah Mu'tah",
+      "ur": "غزوہ موتہ",
+      "hi": "ग़ज़वा-ए-मूताह",
+      "bn": "গাজওয়ায়ে মুতাহ",
+      "id": "Perang Mutah"
+    },
+    "heading": {
+      "en": "8 AH / 629 CE",
+      "ur": "8ھ / 629ء",
+      "hi": "8 हिजरी / 629 ई",
+      "bn": "৮ হিজরি / ৬২৯ খ্রি.",
+      "id": "8 H / 629 M"
+    },
+    "details": {
+      "en": "A Muslim envoy, al-Harith ibn Umayr, was killed by Shurahbil ibn Amr of Ghassan on the way to the Byzantine frontier. The Prophet ﷺ sent about three thousand under Zayd ibn Harithah, then Ja'far ibn Abi Talib, then Abdullah ibn Rawahah. They met a far larger force near Mu'tah in the Balqa' (modern Jordan). All three commanders were martyred. Khalid ibn al-Walid took command and extracted the army. In Madinah the Prophet ﷺ described the succession of standards in a vision and named Khalid Sayf Allah.",
+      "ur": "سفیر حارث بن عمیر کو شراحیل بن عمرو غسانی نے رومی سرحد کی راہ میں قتل کیا۔ نبی ﷺ نے تقریباً تین ہزار زید بن حارثہ، پھر جعفر، پھر عبد اللہ بن رواحہ کی کمان میں بھیجے۔ بلقاء (موجودہ اردن) موتہ کے پاس بہت بڑی فوج سے مقابلہ۔ تینوں کمانڈر شہید۔ خالد نے کمان سنبھالی اور لشکر نکالا। مدینہ میں نبی ﷺ نے جھنڈوں کا منظر بیان کیا اور خالد کو سیف اللہ کہا۔",
+      "hi": "राजदूत की हत्या के बाद तीन हज़ार भेजे गए। ज़ैद, जाफ़र, अब्दुल्लाह बिन रवाहा शहीद। ख़ालिद ने लश्कर बचाया। नबी ﷺ ने सैफुल्लाह कहा।",
+      "bn": "দূত নিহত হলে প্রায় তিন হাজার প্রেরিত হন। যায়েদ, জাফর, আব্দুল্লাহ ইবন রাওয়াহা শহীদ। খালিদ সেনা উদ্ধার করেন। নবী ﷺ তাঁকে সাইফুল্লাহ বলেন।",
+      "id": "Utusan terbunuh; sekitar tiga ribu diberangkatkan. Zaid, Ja'far, Abdullah bin Rawahah syahid. Khalid menyelamatkan pasukan. Nabi ﷺ menamainya Pedang Allah."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "Three commanders",
+          "ur": "تین کمانڈر",
+          "hi": "तीन कमांडर",
+          "bn": "তিন সেনাপতি",
+          "id": "Tiga panglima"
+        },
+        "heading": {
+          "en": "On the Syrian road",
+          "ur": "شام کے راستے",
+          "hi": "शाम की सड़क",
+          "bn": "সিরিয়ার পথে",
+          "id": "Jalan Syam"
+        },
+        "details": {
+          "en": "Zayd was the Prophet's ﷺ freedman and beloved. Ja'far, Ali's brother, fought until both arms were struck; he was called al-Tayyar in Paradise. Ibn Rawahah, a poet of the Ansar, dismounted reciting verses of resolve. Their graves are honoured at Mu'tah.",
+          "ur": "زید نبی ﷺ کے آزاد کردہ اور محبوب تھے۔ جعفر، علی کے بھائی، دونوں بازو کٹنے تک لڑے، جنت میں طیّار کہلائے۔ ابن رواحہ انصاری شاعر عزم کے اشعار پڑھتے اترے۔ ان کی قبریں موتہ میں محترم ہیں۔",
+          "hi": "ज़ैद नबी ﷺ के आज़ाद किए हुए। जाफ़र दोनों बाजू कटने तक लड़े। इब्न रवाहा अनसारी शाईर। क़ब्रें मूताह में हैं।",
+          "bn": "যায়েদ নবী ﷺ-এর মুক্তদাস। জাফর উভয় বাহু কাটা পর্যন্ত যুদ্ধ করেন। ইবন রাওয়াহা আনসার কবি। তাঁদের কবর মুতাহে।",
+          "id": "Zaid maula kekasih Nabi ﷺ. Ja'far berperang hingga kedua lengan terputus, disebut at-Thayyar. Ibnu Rawahah penyair Ansar. Kubur mereka dimuliakan di Mutah."
+        }
+      }
+    ]
+  },
+  {
+    "chapter_id": 6,
+    "title": {
+      "en": "Fath Makkah",
+      "ur": "فتح مکہ",
+      "hi": "फत्हे मक्का",
+      "bn": "মক্কা বিজয়",
+      "id": "Fathu Makkah"
+    },
+    "heading": {
+      "en": "8 AH / 630 CE",
+      "ur": "8ھ / 630ء",
+      "hi": "8 हिजरी / 630 ई",
+      "bn": "৮ হিজরি / ৬৩০ খ্রি.",
+      "id": "8 H / 630 M"
+    },
+    "details": {
+      "en": "Quraysh violated Hudaybiyyah by backing an attack on Khuza'ah, allies of the Prophet ﷺ. He marched with about ten thousand. Abu Sufyan accepted Islam at the edge of the city. Makkah was entered with almost no fighting; weapons were sheathed except against a few who resisted. The Prophet ﷺ forgave Quraysh: 'Go, for you are free.' Idols were removed from the Ka'bah, and the city that had driven him out became the heart of the Ummah again.",
+      "ur": "قریش نے حدیبیہ توڑی، خزاعہ پر حملے کی حمایت کی جو نبی ﷺ کے حلیف تھے۔ تقریباً دس ہزار کے ساتھ روانہ۔ ابو سفیان شہر کے کنارے اسلام لائے۔ مکہ تقریباً بغیر لڑائی داخل، چند مزاحمتیوں کے سوا ہتھیار بند۔ فرمایا جاؤ تم آزاد ہو۔ کعبہ سے بت ہٹائے، وہ شہر جس نے نکالا تھا امت کا مرکز پھر بنا।",
+      "hi": "कुरैश ने हुदैबिया तोड़ी। दस हज़ार के साथ मक्का लगभग बिना लड़ाई फतह। कुरैश को माफ़ किया। काबा से बुत हटाए।",
+      "bn": "কুরাইশ হুদায়বিয়া ভঙ্গ করে। প্রায় দশ হাজার নিয়ে প্রায় বিনা যুদ্ধে মক্কা বিজিত। তিনি ক্ষমা করেন। কাবা থেকে মূর্তি সরানো হয়।",
+      "id": "Quraisy merusak Hudaibiyah. Sekitar sepuluh ribu masuk Makkah hampir tanpa perang. Beliau memaafkan: 'Pergilah, kalian bebas.' Berhala di Ka'bah dihapus."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "Amnesty and the Ka'bah",
+          "ur": "عام معافی اور کعبہ",
+          "hi": "आम माफ़ी और काबा",
+          "bn": "সাধারণ ক্ষমা ও কাবা",
+          "id": "Ampunan dan Ka'bah"
+        },
+        "heading": {
+          "en": "The conquest",
+          "ur": "فتح",
+          "hi": "फतह",
+          "bn": "বিজয়",
+          "id": "Penaklukan"
+        },
+        "details": {
+          "en": "A few named persons were excepted from general amnesty for crimes; some were later pardoned. Bilal gave adhan from the Ka'bah. The keys remained with the family of Uthman ibn Talhah as the Prophet ﷺ had promised. Many of Quraysh entered Islam after seeing this forbearance.",
+          "ur": "چند نامزد افراد عام معافی سے مستثنیٰ تھے سنگین جرائم پر؛ بعض بعد میں معاف ہوئے। بلال نے کعبہ پر اذان دی۔ کنجیاں عثمان بن طلحہ کے خاندان کے پاس رہیں جیسا وعدہ تھا۔ یہ برداشت دیکھ کر بہت سے قریش مسلمان ہوئے۔",
+          "hi": "कुछ नाम आम माफ़ी से बाहर थे। बिलाल ने काबा पर अज़ान दी। कुंजियां उसी ख़ानदान के पास रहीं। इस सब्र को देख कुरैश के बहुत इस्लाम लाए।",
+          "bn": "কয়েকজন সাধারণ ক্ষমা থেকে বাদ। বিলাল কাবায় আজান দেন। চাবি উসমান ইবন তালহার পরিবারেই থাকে। এই সহিষ্ণুতা দেখে অনেকে ইসলাম গ্রহণ করেন।",
+          "id": "Beberapa orang dikecualikan dari ampunan umum. Bilal azan di Ka'bah. Kunci tetap pada keluarga Utsman bin Thalhah. Banyak Quraisy masuk Islam karena kesabaran ini."
+        }
+      }
+    ]
+  },
+  {
+    "chapter_id": 7,
+    "title": {
+      "en": "Ghazwah Hunayn and Ta'if",
+      "ur": "غزوہ حنین اور طائف",
+      "hi": "ग़ज़वा-ए-हुनैन और ताइफ़",
+      "bn": "গাজওয়ায়ে হুনাইন ও তায়েফ",
+      "id": "Perang Hunain dan Thaif"
+    },
+    "heading": {
+      "en": "8 AH / 630 CE",
+      "ur": "8ھ / 630ء",
+      "hi": "8 हिजरी / 630 ई",
+      "bn": "৮ হিজরি / ৬৩০ খ্রি.",
+      "id": "8 H / 630 M"
+    },
+    "details": {
+      "en": "Hawazin and Thaqif gathered at Hunayn after the Conquest of Makkah. The large Muslim army was ambushed in a valley and initially fled. The Prophet ﷺ stood firm with a few, and the Muslims rallied to a victory mentioned in the Quran (9:25–26). Captives and flocks were taken, then many of Hawazin were released as a gift. Ta'if was besieged but not stormed; Thaqif accepted Islam later. The Prophet ﷺ lingered at al-Ji'ranah to distribute booty and perform umrah.",
+      "ur": "فتح مکہ کے بعد ہوازن اور ثقیف حنین پر اکٹھے ہوئے۔ بڑا اسلامی لشکر وادی میں گھात کھا کر پہلے بھگا। نبی ﷺ چند لوگوں کے ساتھ جمے رہے، مسلمان پلٹے، قرآن میں مذکور فتح (9:25–26)۔ قیدی اور ریوڑ، پھر ہوازن کے بہت سے قیدی احساناً چھوڑے گئے۔ طائف کا محاصرہ ہوا مگر زور سے نہ توڑا؛ ثقیف بعد میں اسلام لائے۔ جعرانہ میں مال تقسیم اور عمرہ۔",
+      "hi": "हवाज़िन और सक़ीफ़ हुनैन पर जमा हुए। पहले मुसलमान घबराए, नबी ﷺ डटे रहे, फतह हुई। ताइफ़ घेरा गया, सक़ीफ़ बाद में इस्लाम लाए।",
+      "bn": "হাওয়াজিন ও সাকিফ হুনাইনে জড়ো হয়। প্রথমে মুসলিমরা ছত্রভঙ্গ, নবী ﷺ স্থির থাকেন, বিজয় হয়। তায়েফ অবরোধ হয়, সাকিফ পরে ইসলাম গ্রহণ করে।",
+      "id": "Hawazin dan Saqif berkumpul di Hunain. Pasukan muslim sempat kocar-kacir, Nabi ﷺ tetap berdiri, lalu menang (9:25–26). Thaif dikepung; Saqif masuk Islam kemudian."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "Pride and then victory",
+          "ur": "غرور پھر فتح",
+          "hi": "घमंड फिर फतह",
+          "bn": "অহংকার ও পরে বিজয়",
+          "id": "Bangga lalu menang"
+        },
+        "heading": {
+          "en": "After Makkah",
+          "ur": "فتح مکہ کے بعد",
+          "hi": "फत्हे मक्का के बाद",
+          "bn": "মক্কা বিজয়ের পর",
+          "id": "Setelah Fathu Makkah"
+        },
+        "details": {
+          "en": "Some newly joined people trusted in numbers. The Quran reminds that Allah helped when they were few. After victory the Prophet ﷺ gave larger gifts to new Muslims of Quraysh (mu'allafa qulubuhum) to reconcile hearts, and the Ansar were reassured that they remained his inner companions.",
+          "ur": "کچھ نئے شامل لوگوں نے کثرت پر بھروسہ کیا۔ قرآن یاد دلاتا ہے اللہ نے اس وقت مدد کی جب وہ کم تھے۔ فتح کے بعد نئے مسلماں قریش کو زیادہ حصہ (مؤلفۃ القلوب) دیا تاکہ دل جڑیں، انصار کو یقین دلایا کہ وہ اندرونی ساتھی ہیں۔",
+          "hi": "कुछ ने तादाद पर भरोसा किया। फतह के बाद नए मुसलमानों को ज़्यादा हिस्सा दिया दिल जोड़ने को, अनसार को तसल्ली दी।",
+          "bn": "কেউ কেউ সংখ্যায় ভরসা করে। বিজয়ের পর নতুন মুসলিমদের বেশি অংশ দিয়ে হৃদয় জয় করা হয়, আনসারকে প্রত্যয় দেওয়া হয়।",
+          "id": "Sebagian mengandalkan jumlah. Setelah menang Nabi ﷺ memberi lebih kepada mualaf Quraisy dan menenangkan Ansar bahwa mereka tetap sahabat inti."
+        }
+      }
+    ]
+  },
+  {
+    "chapter_id": 8,
+    "title": {
+      "en": "Ghazwah Tabuk",
+      "ur": "غزوہ تبوک",
+      "hi": "ग़ज़वा-ए-तबूक",
+      "bn": "গাজওয়ায়ে তাবুক",
+      "id": "Perang Tabuk"
+    },
+    "heading": {
+      "en": "9 AH / 630 CE",
+      "ur": "9ھ / 630ء",
+      "hi": "9 हिजरी / 630 ई",
+      "bn": "৯ হিজরি / ৬৩০ খ্রি.",
+      "id": "9 H / 630 M"
+    },
+    "details": {
+      "en": "Reports of a Byzantine gathering in the north led the Prophet ﷺ to call an expedition in intense heat and scarcity — the Year of Difficulty (Am al-Usrah). Uthman equipped the army generously. About thirty thousand marched to Tabuk on the road to Syria. No major battle occurred; border tribes made peace. Hypocrites who stayed behind without excuse are rebuked in Surah al-Tawbah. The three who remained behind then told the truth (Ka'b ibn Malik and two others) were boycotted until Allah accepted their repentance (9:118).",
+      "ur": "شمال میں رومی اجتماع کی خبر پر نبی ﷺ نے شدید گرمی اور تنگی میں لشکر بلاया — عام العسرہ۔ عثمان نے خوب سازو سامان دیا۔ تقریباً تیس ہزار تبوک شام کی راہ پر گئے۔ بڑی لڑائی نہ ہوئی؛ سرحدی قبائل صلح پر آئے۔ بغیر عذر پیچھے رہنے والے منافق سورہ توبہ میں ملامت۔ جو سچ بولے (کعب بن مالک وغیرہ) بائیکاٹ رہے یہاں تک کہ اللہ نے توبہ قبول کی (9:118)۔",
+      "hi": "उत्तर में रूमी जमाव की ख़बर पर गर्मी में लश्कर। उसमान ने साज़ो सामान दिया। तबूक तक गए, बड़ी लड़ाई नहीं। सुरह तौबा में मुनाफ़िक़ों की मलामत।",
+      "bn": "উত্তরে রোমান জমায়েতের খবর তীব্র গরমে অভিযান। উসমান সেনা সজ্জিত করেন। তাবুকে বড় যুদ্ধ হয়নি। সূরা তাওবায় মুনাফিকদের নিন্দা।",
+      "id": "Kabar pasukan Rum di utara; ekspedisi di panas dan susah. Utsman membekali pasukan. Sekitar tiga puluh ribu ke Tabuk, tanpa pertempuran besar. Surah at-Taubah mencela munafik yang tinggal."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "The Year of Difficulty",
+          "ur": "عام العسرہ",
+          "hi": "आम उल-उसरा",
+          "bn": "আম আল-উসরাহ",
+          "id": "Tahun Kesulitan"
+        },
+        "heading": {
+          "en": "The last campaign he led",
+          "ur": "آخری مہم جو خود قیادت کی",
+          "hi": "आख़िरी मुहिम जो ख़ुद क़ियादत की",
+          "bn": "তাঁর নিজের নেতৃত্বাধীন শেষ অভিযান",
+          "id": "Ekspedisi terakhir yang beliau pimpin"
+        },
+        "details": {
+          "en": "This was the last ghazwah the Prophet ﷺ led in person. On the return, the mosque of dirar (harm) was ordered demolished (9:107–110). Delegations continued to come to Madinah. Tabuk showed that the Ummah could mobilise at scale even in hardship, and that sincerity was tested when there was no booty in sight.",
+          "ur": "یہ آخری غزوہ تھا جس کی قیادت نبی ﷺ نے خود کی۔ واپسی پر مسجد ضرار گرانے کا حکم ہوا (9:107–110)۔ وفود مدینہ آتے رہے۔ تبوک نے دکھایا کہ تنگی میں بھی امت بڑے پیمانے پر نکل سکتی ہے، اور جب مال نظر نہ ہو تو اخلاص آزمایا جاتا ہے۔",
+          "hi": "यह आख़िरी ग़ज़वा था जिसकी क़ियादत नबी ﷺ ने ख़ुद की। वापसी पर मस्जिदे ज़िरार गिराने का हुक्म। तबूक ने इख़लास आज़माया जब ग़नीमत न थी।",
+          "bn": "এটি তাঁর নিজের নেতৃত্বাধীন শেষ গাজওয়া। ফেরার পথে মসজিদে দিরার ভাঙার নির্দেশ। তাবুক দেখায় কষ্টেও উম্মাহ সজ্জিত হতে পারে, গনিমত না থাকলে ইখলাস পরীক্ষিত হয়।",
+          "id": "Ini ghazwah terakhir yang dipimpin Nabi ﷺ sendiri. Sejumlah masjid dhirar diperintahkan dihancurkan. Tabuk menguji keikhlasan saat tidak ada ganimah."
+        }
+      }
+    ]
+  }
+]
