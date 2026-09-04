@@ -1,13 +1,15 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '../../features/hadith/data/hadith_db_helper.dart';
+import '../controllers/bookmark_controller.dart';
+import '../controllers/settings_controller.dart';
 import '../data/quran_repository.dart';
 import '../data/repositories/api_quran_repository_impl.dart';
 import 'audio_service.dart';
 import 'auth_service.dart';
 import 'storage_service.dart';
 import 'sync_service.dart';
-import '../controllers/settings_controller.dart';
 
 Future<void> initAppServices() async {
   await GetStorage.init();
@@ -28,6 +30,20 @@ Future<void> initAppServices() async {
 
   if (!Get.isRegistered<QuranRepository>()) {
     Get.put<QuranRepository>(ApiQuranRepositoryImpl(), permanent: true);
+  }
+
+  if (!Get.isRegistered<HadithDbHelper>()) {
+    await Get.putAsync<HadithDbHelper>(
+      () => HadithDbHelper.instance.init(),
+      permanent: true,
+    );
+  }
+
+  if (!Get.isRegistered<BookmarkController>()) {
+    await Get.putAsync<BookmarkController>(
+      () => BookmarkController().init(),
+      permanent: true,
+    );
   }
 
   if (!Get.isRegistered<AudioService>()) {

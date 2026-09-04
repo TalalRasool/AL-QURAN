@@ -19,6 +19,7 @@ mixin HifzModeMixin on GetxController {
     } else {
       revealedAyahs.add(ayahNumber);
     }
+    revealedAyahs.refresh();
   }
 
   void resetRevealedAyahs() {

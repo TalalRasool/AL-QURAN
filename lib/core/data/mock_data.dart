@@ -11,16 +11,6 @@ class MockReciter {
   final String subtitle;
 }
 
-class MockTranslation {
-  const MockTranslation({
-    required this.name,
-    required this.language,
-  });
-
-  final String name;
-  final String language;
-}
-
 class MockDua {
   const MockDua({
     required this.title,
@@ -279,13 +269,6 @@ class MockData {
     MockReciter(name: 'Saad Al-Ghamdi', subtitle: 'Full Quran'),
     MockReciter(name: 'Ahmed Al-Ajmi', subtitle: 'Full Quran'),
     MockReciter(name: 'Yasser Al-Dosari', subtitle: 'Full Quran'),
-  ];
-
-  static const List<MockTranslation> translations = [
-    MockTranslation(name: 'Sahih International', language: 'English'),
-    MockTranslation(name: 'Abdullah Yusuf Ali', language: 'English'),
-    MockTranslation(name: 'Marmaduke Pickthall', language: 'English'),
-    MockTranslation(name: 'Mufti Taqi Usmani', language: 'English'),
   ];
 
   static const List<MockDua> duas = [

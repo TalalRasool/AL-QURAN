@@ -59,10 +59,7 @@ class ApiQuranRepositoryImpl implements QuranRepository {
     if (surahs.isEmpty) {
       throw StateError('No surahs available');
     }
-    return surahs.firstWhere(
-      (surah) => surah.number == number,
-      orElse: () => surahs.first,
-    );
+    return surahs.firstWhere((surah) => surah.number == number);
   }
 
   @override

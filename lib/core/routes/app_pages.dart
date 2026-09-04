@@ -1,6 +1,13 @@
 import 'package:get/get.dart';
 
+import '../../features/hadith/hadith_binding.dart';
+import '../../features/hadith/hadith_chapters_screen.dart';
+import '../../features/hadith/hadith_read_screen.dart';
 import '../../screens/bookmarks/bookmarks_screen.dart';
+import '../../screens/hifz_tester_binding.dart';
+import '../../screens/hifz_tester_screen.dart';
+import '../../screens/history/islamic_history_binding.dart';
+import '../../screens/history/islamic_history_screen.dart';
 import '../../screens/main/main_binding.dart';
 import '../../screens/main/main_navigation_screen.dart';
 import '../../screens/mushaf/mushaf_binding.dart';
@@ -55,6 +62,26 @@ class AppPages {
         initialPage: MushafController.resolveInitialPage(Get.arguments),
       ),
       binding: MushafBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.hadithChapters,
+      page: () => const HadithChaptersScreen(),
+      binding: HadithChaptersBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.hadithRead,
+      page: () => const HadithReadScreen(),
+      binding: HadithReadBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.islamicHistory,
+      page: () => const IslamicHistoryScreen(),
+      binding: IslamicHistoryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.hifzTester,
+      page: () => const HifzTesterScreen(),
+      binding: HifzTesterBinding(),
     ),
   ];
 }

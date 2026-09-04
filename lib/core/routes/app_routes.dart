@@ -10,4 +10,8 @@ abstract class AppRoutes {
   static const String translations = '/translations';
   static const String mushaf = '/mushaf';
   static const String onboarding = '/onboarding';
+  static const String hadithChapters = '/hadith-chapters';
+  static const String hadithRead = '/hadith-read';
+  static const String islamicHistory = '/islamic-history';
+  static const String hifzTester = '/hifz-tester';
 }

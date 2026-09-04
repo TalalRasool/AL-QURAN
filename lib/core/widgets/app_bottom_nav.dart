@@ -21,6 +21,7 @@ class AppBottomNav extends StatelessWidget {
     final items = <_NavItem>[
       const _NavItem(label: 'Home', asset: AppAssets.homeIcon),
       const _NavItem(label: 'Quran', asset: AppAssets.quranIcon),
+      const _NavItem(label: 'Hadith', icon: Icons.menu_book_rounded),
       const _NavItem(label: 'Audio', asset: AppAssets.audioIcon),
       const _NavItem(label: 'Qibla', asset: AppAssets.qiblaCompass),
       const _NavItem(label: 'Profile', asset: AppAssets.profileIcon),
@@ -40,7 +41,7 @@ class AppBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
           child: Row(
             children: List.generate(items.length, (index) {
               final item = items[index];
@@ -58,20 +59,26 @@ class AppBottomNav extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SvgPicture.asset(
-                          item.asset,
-                          width: 22.w,
-                          height: 22.w,
-                          colorFilter: ColorFilter.mode(
-                            color,
-                            BlendMode.srcIn,
+                        if (item.icon != null)
+                          Icon(item.icon, size: 22.sp, color: color)
+                        else
+                          SvgPicture.asset(
+                            item.asset!,
+                            width: 22.w,
+                            height: 22.w,
+                            colorFilter: ColorFilter.mode(
+                              color,
+                              BlendMode.srcIn,
+                            ),
                           ),
-                        ),
                         SizedBox(height: 4.h),
                         Text(
                           item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.caption.copyWith(
                             color: color,
+                            fontSize: 10.sp,
                             fontWeight:
                                 isActive ? FontWeight.w600 : FontWeight.w400,
                           ),
@@ -90,8 +97,9 @@ class AppBottomNav extends StatelessWidget {
 }
 
 class _NavItem {
-  const _NavItem({required this.label, required this.asset});
+  const _NavItem({required this.label, this.asset, this.icon});
 
   final String label;
-  final String asset;
+  final String? asset;
+  final IconData? icon;
 }

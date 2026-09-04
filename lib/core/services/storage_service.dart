@@ -9,9 +9,13 @@ class StorageService extends GetxService {
   static const lastReadKey = 'last_read';
   static const mushafLastPageKey = 'mushaf_last_page';
   static const bookmarksKey = 'bookmarks';
+  static const hadithBookmarksKey = 'hadith_bookmarks';
+  static const duaBookmarksKey = 'dua_bookmarks';
+  static const unifiedBookmarksKey = 'unified_bookmarks';
   static const reciterIdKey = 'selected_reciter_id';
   static const reciterNameKey = 'selected_reciter_name';
   static const tasbihCountKey = 'tasbih_count';
+  static const tasbihMaxCount = 100000;
   static const translationIdKey = 'selected_translation_id';
   static const translationNameKey = 'selected_translation_name';
   static const translationLanguageKey = 'selected_translation_language';
@@ -25,11 +29,14 @@ class StorageService extends GetxService {
   static const onboardingCompleteKey = 'onboarding_complete';
   static const userNameKey = 'user_name';
   static const userCountryKey = 'user_country';
+  static const notificationsKey = 'notifications_enabled';
 
   late final GetStorage _box;
 
   final lastRead = Rxn<LastRead>();
   final bookmarks = <int>[].obs;
+  final hadithBookmarks = <int>[].obs;
+  final duaBookmarks = <String>[].obs;
   final selectedReciterId = defaultReciterId.obs;
   final selectedReciterName = defaultReciterName.obs;
   final tasbihCount = 0.obs;
@@ -40,11 +47,14 @@ class StorageService extends GetxService {
   final hasCompletedOnboarding = false.obs;
   final userName = ''.obs;
   final userCountry = ''.obs;
+  final notificationsEnabled = true.obs;
 
   Future<StorageService> init() async {
     _box = GetStorage();
     lastRead.value = _readLastRead();
     bookmarks.assignAll(_readBookmarks());
+    hadithBookmarks.assignAll(_readHadithBookmarks());
+    duaBookmarks.assignAll(_readDuaBookmarks());
     selectedReciterId.value =
         _box.read(reciterIdKey) as String? ?? defaultReciterId;
     selectedReciterName.value =
@@ -64,6 +74,8 @@ class StorageService extends GetxService {
         _box.read(onboardingCompleteKey) as bool? ?? false;
     userName.value = _box.read(userNameKey) as String? ?? '';
     userCountry.value = _box.read(userCountryKey) as String? ?? '';
+    notificationsEnabled.value =
+        _box.read(notificationsKey) as bool? ?? true;
     return this;
   }
 
@@ -119,13 +131,64 @@ class StorageService extends GetxService {
 
   bool isBookmarked(int surahNumber) => bookmarks.contains(surahNumber);
 
-  Future<void> toggleBookmark(int surahNumber) async {
-    if (isBookmarked(surahNumber)) {
-      bookmarks.remove(surahNumber);
-    } else {
+  Future<bool> toggleBookmark(int surahNumber) async {
+    final added = !isBookmarked(surahNumber);
+    if (added) {
       bookmarks.add(surahNumber);
+    } else {
+      bookmarks.remove(surahNumber);
     }
     await _box.write(bookmarksKey, List<int>.from(bookmarks));
+    return added;
+  }
+
+  bool isHadithBookmarked(int hadithId) => hadithBookmarks.contains(hadithId);
+
+  Future<bool> toggleHadithBookmark(int hadithId) async {
+    final added = !isHadithBookmarked(hadithId);
+    if (added) {
+      hadithBookmarks.add(hadithId);
+    } else {
+      hadithBookmarks.remove(hadithId);
+    }
+    await _box.write(hadithBookmarksKey, List<int>.from(hadithBookmarks));
+    return added;
+  }
+
+  bool isDuaBookmarked(String duaId) => duaBookmarks.contains(duaId);
+
+  Future<bool> toggleDuaBookmark(String duaId) async {
+    final added = !isDuaBookmarked(duaId);
+    if (added) {
+      duaBookmarks.add(duaId);
+    } else {
+      duaBookmarks.remove(duaId);
+    }
+    await _box.write(duaBookmarksKey, List<String>.from(duaBookmarks));
+    return added;
+  }
+
+  Future<void> replaceHadithBookmarks(List<int> ids) async {
+    hadithBookmarks.assignAll(ids);
+    await _box.write(hadithBookmarksKey, List<int>.from(hadithBookmarks));
+  }
+
+  Future<void> replaceDuaBookmarks(List<String> ids) async {
+    duaBookmarks.assignAll(ids);
+    await _box.write(duaBookmarksKey, List<String>.from(duaBookmarks));
+  }
+
+  List<Map<String, dynamic>> loadUnifiedBookmarks() {
+    final raw = _box.read(unifiedBookmarksKey);
+    if (raw is! List) return [];
+    return [
+      for (final item in raw)
+        if (item is Map) Map<String, dynamic>.from(item),
+    ];
+  }
+
+  Future<void> saveUnifiedBookmarks(List<Map<String, dynamic>> value) {
+    return _box.write(unifiedBookmarksKey, value);
   }
 
   Future<void> saveReciter({
@@ -171,6 +234,11 @@ class StorageService extends GetxService {
     await _box.write(userCountryKey, userCountry.value);
   }
 
+  Future<void> saveNotificationsEnabled(bool value) async {
+    notificationsEnabled.value = value;
+    await _box.write(notificationsKey, value);
+  }
+
   Future<void> completeOnboarding() async {
     hasCompletedOnboarding.value = true;
     await _box.write(onboardingCompleteKey, true);
@@ -179,8 +247,9 @@ class StorageService extends GetxService {
   int getTasbihCount() => tasbihCount.value;
 
   Future<void> saveTasbihCount(int count) async {
-    tasbihCount.value = count;
-    await _box.write(tasbihCountKey, count);
+    final clamped = count.clamp(0, tasbihMaxCount);
+    tasbihCount.value = clamped;
+    await _box.write(tasbihCountKey, clamped);
   }
 
   LastRead? _readLastRead() {
@@ -199,10 +268,34 @@ class StorageService extends GetxService {
     return [];
   }
 
+  List<int> _readHadithBookmarks() {
+    final raw = _box.read(hadithBookmarksKey);
+    if (raw is! List) return [];
+    return [
+      for (final item in raw)
+        if (item is int)
+          item
+        else if (item is num)
+          item.toInt(),
+    ];
+  }
+
+  List<String> _readDuaBookmarks() {
+    final raw = _box.read(duaBookmarksKey);
+    if (raw is! List) return [];
+    return [
+      for (final item in raw)
+        if ('$item'.trim().isNotEmpty) '$item',
+    ];
+  }
+
   int _readTasbihCount() {
     final raw = _box.read(tasbihCountKey);
-    if (raw is int) return raw;
-    if (raw is num) return raw.toInt();
-    return int.tryParse('$raw') ?? 0;
+    final parsed = raw is int
+        ? raw
+        : raw is num
+            ? raw.toInt()
+            : int.tryParse('$raw') ?? 0;
+    return parsed.clamp(0, tasbihMaxCount);
   }
 }
