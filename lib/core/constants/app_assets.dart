@@ -18,7 +18,6 @@ class AppAssets {
   static const String homeIcon = '$_icons/home.svg';
   static const String quranIcon = '$_icons/quran.svg';
   static const String audioIcon = '$_icons/audio.svg';
-  static const String qiblaCompass = '$_icons/qibla_compass.svg';
   static const String profileIcon = '$_icons/profile.svg';
 
   // ── Utility icons ──────────────────────────────────────────────────
@@ -43,4 +42,7 @@ class AppAssets {
   static const String seerahJson = 'assets/json/seerah.json';
   static const String sahabaJson = 'assets/json/sahaba.json';
   static const String ghazawatJson = 'assets/json/ghazawat.json';
+
+  static const String quranWbwDb =
+      'assets/databases/quran_5_languages_wbw_full.db';
 }
