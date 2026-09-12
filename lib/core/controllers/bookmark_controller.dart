@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:get/get.dart';
 
@@ -13,18 +14,14 @@ import '../widgets/bookmark_icon_button.dart';
 class BookmarkController extends GetxService {
   final items = <AppBookmark>[].obs;
 
-  late final StorageService _storage;
+  late StorageService _storage;
   Worker? _legacyWorker;
   bool _syncingLegacy = false;
+  var _didLoad = false;
 
   Future<BookmarkController> init() async {
     _storage = Get.find<StorageService>();
-    items.assignAll(
-      _storage
-          .loadUnifiedBookmarks()
-          .map(AppBookmark.fromJson)
-          .where((item) => item.id.isNotEmpty),
-    );
+    _loadFromStorage();
     await _migrateLegacyIfNeeded();
     _legacyWorker = ever(_storage.bookmarks, (_) {
       if (_syncingLegacy) return;
@@ -32,6 +29,52 @@ class BookmarkController extends GetxService {
     });
     unawaited(_enrichMetadata());
     return this;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (_didLoad || !Get.isRegistered<StorageService>()) return;
+    _storage = Get.find<StorageService>();
+    _loadFromStorage();
+  }
+
+  /// Decodes the JSON bookmark list from local storage after a cold start.
+  void _loadFromStorage() {
+    final decoded = _decodeBookmarksJson(
+      _storage.readUnifiedBookmarksJson() ?? '',
+    );
+    if (decoded.isNotEmpty) {
+      items.assignAll(decoded);
+    } else {
+      items.assignAll(
+        _storage
+            .loadUnifiedBookmarks()
+            .map(AppBookmark.fromJson)
+            .where((item) => item.id.isNotEmpty),
+      );
+    }
+    _didLoad = true;
+  }
+
+  /// Encodes bookmarked items (surah, ayah/page, ids) as a JSON string.
+  String encodeBookmarksJson() {
+    return jsonEncode(items.map((item) => item.toJson()).toList());
+  }
+
+  List<AppBookmark> _decodeBookmarksJson(String json) {
+    if (json.trim().isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(json);
+      if (decoded is! List) return const [];
+      return [
+        for (final item in decoded)
+          if (item is Map)
+            AppBookmark.fromJson(Map<String, dynamic>.from(item)),
+      ].where((item) => item.id.isNotEmpty).toList();
+    } catch (_) {
+      return const [];
+    }
   }
 
   @override
@@ -303,9 +346,7 @@ class BookmarkController extends GetxService {
   }
 
   Future<void> _persistUnifiedOnly() {
-    return _storage.saveUnifiedBookmarks(
-      items.map((item) => item.toJson()).toList(),
-    );
+    return _storage.saveUnifiedBookmarksJson(encodeBookmarksJson());
   }
 
   Future<void> _writeLegacy() async {
