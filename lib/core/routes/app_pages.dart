@@ -15,8 +15,14 @@ import '../../screens/mushaf/mushaf_controller.dart';
 import '../../screens/mushaf/mushaf_screen.dart';
 import '../../screens/onboarding/onboarding_binding.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
+import '../../screens/profile/edit_profile_screen.dart';
+import '../../screens/profile/profile_controller.dart';
+import '../../screens/quran/quran_reading_binding.dart';
+import '../../screens/quran/quran_reading_screen.dart';
 import '../../screens/quran/surah_detail_binding.dart';
 import '../../screens/quran/surah_detail_screen.dart';
+import '../../screens/study/offline_quran_binding.dart';
+import '../../screens/study/offline_quran_screen.dart';
 import '../../screens/tasbih/tasbih_binding.dart';
 import '../../screens/tasbih/tasbih_screen.dart';
 import '../../screens/translations/translations_binding.dart';
@@ -82,6 +88,25 @@ class AppPages {
       name: AppRoutes.hifzTester,
       page: () => const HifzTesterScreen(),
       binding: HifzTesterBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.quranStudy,
+      page: () => const QuranStudyScreen(),
+      binding: OfflineQuranBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.quranReading,
+      page: () => const QuranReadingScreen(),
+      binding: QuranReadingBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.editProfile,
+      page: () => const EditProfileScreen(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<ProfileController>()) {
+          Get.put(ProfileController());
+        }
+      }),
     ),
   ];
 }

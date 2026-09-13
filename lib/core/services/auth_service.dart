@@ -58,6 +58,24 @@ class AuthService extends GetxService {
     currentUser.value = null;
   }
 
+  Future<void> updateProfile({
+    required String name,
+    String country = '',
+  }) async {
+    final client = _client;
+    if (client == null || currentUser.value == null) return;
+    final response = await client.auth.updateUser(
+      UserAttributes(
+        data: {
+          'full_name': name,
+          'name': name,
+          'country': country,
+        },
+      ),
+    );
+    currentUser.value = response.user ?? client.auth.currentUser;
+  }
+
   SupabaseClient? get _client {
     try {
       return Supabase.instance.client;

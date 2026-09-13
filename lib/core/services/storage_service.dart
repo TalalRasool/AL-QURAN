@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -30,6 +32,9 @@ class StorageService extends GetxService {
   static const userNameKey = 'user_name';
   static const userCountryKey = 'user_country';
   static const notificationsKey = 'notifications_enabled';
+  static const prayerNotificationsKey = 'prayer_notifications_enabled';
+  static const prayerLatitudeKey = 'prayer_latitude';
+  static const prayerLongitudeKey = 'prayer_longitude';
 
   late final GetStorage _box;
 
@@ -48,6 +53,9 @@ class StorageService extends GetxService {
   final userName = ''.obs;
   final userCountry = ''.obs;
   final notificationsEnabled = true.obs;
+  final prayerNotificationsEnabled = false.obs;
+  final prayerLatitude = RxnDouble();
+  final prayerLongitude = RxnDouble();
 
   Future<StorageService> init() async {
     _box = GetStorage();
@@ -76,6 +84,10 @@ class StorageService extends GetxService {
     userCountry.value = _box.read(userCountryKey) as String? ?? '';
     notificationsEnabled.value =
         _box.read(notificationsKey) as bool? ?? true;
+    prayerNotificationsEnabled.value =
+        _box.read(prayerNotificationsKey) as bool? ?? false;
+    prayerLatitude.value = _readDouble(prayerLatitudeKey);
+    prayerLongitude.value = _readDouble(prayerLongitudeKey);
     return this;
   }
 
@@ -179,16 +191,41 @@ class StorageService extends GetxService {
   }
 
   List<Map<String, dynamic>> loadUnifiedBookmarks() {
-    final raw = _box.read(unifiedBookmarksKey);
-    if (raw is! List) return [];
-    return [
-      for (final item in raw)
-        if (item is Map) Map<String, dynamic>.from(item),
-    ];
+    return _mapsFromBookmarkJson(_box.read(unifiedBookmarksKey));
   }
 
   Future<void> saveUnifiedBookmarks(List<Map<String, dynamic>> value) {
-    return _box.write(unifiedBookmarksKey, value);
+    return saveUnifiedBookmarksJson(jsonEncode(value));
+  }
+
+  Future<void> saveUnifiedBookmarksJson(String json) {
+    return _box.write(unifiedBookmarksKey, json);
+  }
+
+  String? readUnifiedBookmarksJson() {
+    final raw = _box.read(unifiedBookmarksKey);
+    if (raw is String) return raw;
+    if (raw is List) return jsonEncode(raw);
+    return null;
+  }
+
+  List<Map<String, dynamic>> _mapsFromBookmarkJson(dynamic raw) {
+    List<dynamic>? list;
+    if (raw is String && raw.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is List) list = decoded;
+      } catch (_) {
+        return [];
+      }
+    } else if (raw is List) {
+      list = raw;
+    }
+    if (list == null) return [];
+    return [
+      for (final item in list)
+        if (item is Map) Map<String, dynamic>.from(item),
+    ];
   }
 
   Future<void> saveReciter({
@@ -239,6 +276,21 @@ class StorageService extends GetxService {
     await _box.write(notificationsKey, value);
   }
 
+  Future<void> savePrayerNotificationsEnabled(bool value) async {
+    prayerNotificationsEnabled.value = value;
+    await _box.write(prayerNotificationsKey, value);
+  }
+
+  Future<void> savePrayerCoordinates({
+    required double latitude,
+    required double longitude,
+  }) async {
+    prayerLatitude.value = latitude;
+    prayerLongitude.value = longitude;
+    await _box.write(prayerLatitudeKey, latitude);
+    await _box.write(prayerLongitudeKey, longitude);
+  }
+
   Future<void> completeOnboarding() async {
     hasCompletedOnboarding.value = true;
     await _box.write(onboardingCompleteKey, true);
@@ -262,10 +314,11 @@ class StorageService extends GetxService {
 
   List<int> _readBookmarks() {
     final raw = _box.read(bookmarksKey);
-    if (raw is List) {
-      return raw.whereType<int>().toList();
-    }
-    return [];
+    if (raw is! List) return [];
+    return [
+      for (final item in raw)
+        asInt(item),
+    ].where((number) => number > 0).toList();
   }
 
   List<int> _readHadithBookmarks() {
@@ -297,5 +350,12 @@ class StorageService extends GetxService {
             ? raw.toInt()
             : int.tryParse('$raw') ?? 0;
     return parsed.clamp(0, tasbihMaxCount);
+  }
+
+  double? _readDouble(String key) {
+    final raw = _box.read(key);
+    if (raw is double) return raw;
+    if (raw is num) return raw.toDouble();
+    return double.tryParse('$raw');
   }
 }
