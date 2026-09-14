@@ -225,4 +225,21 @@ class Juz {
       startAyahNumber: 1,
     ),
   ];
+
+  Juz? get nextJuz {
+    if (number >= all.length) return null;
+    return all[number];
+  }
+
+  /// Inclusive start and exclusive end of this juz in surah/ayah coordinates.
+  /// A null [endSurahNumber] means the juz runs through the end of the Quran.
+  ({int startSurah, int startAyah, int? endSurah, int? endAyah}) get bounds {
+    final next = nextJuz;
+    return (
+      startSurah: startSurahNumber,
+      startAyah: startAyahNumber,
+      endSurah: next?.startSurahNumber,
+      endAyah: next?.startAyahNumber,
+    );
+  }
 }
