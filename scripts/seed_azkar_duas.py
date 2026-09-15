@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from dua_i18n import localized_title, localized_translation
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "assets" / "json"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -194,24 +196,25 @@ assert len(AZKAR) >= 50, len(AZKAR)
 assert len(DUAS) >= 100, len(DUAS)
 assert len({d[0] for d in DUAS}) == len(DUAS)
 
-(OUT / "azkar.json").write_text(
-    json.dumps([{"arabic": a} for a in AZKAR], ensure_ascii=False, indent=2),
-    encoding="utf-8",
-)
-(OUT / "duas.json").write_text(
-    json.dumps(
-        [
-            {
-                "id": i,
-                "title": t,
-                "arabic_text": ar,
-                "translation": tr,
-            }
-            for i, t, ar, tr in DUAS
-        ],
-        ensure_ascii=False,
-        indent=2,
-    ),
-    encoding="utf-8",
-)
-print(f"Wrote {len(AZKAR)} azkar and {len(DUAS)} duas")
+if __name__ == "__main__":
+    (OUT / "azkar.json").write_text(
+        json.dumps([{"arabic": a} for a in AZKAR], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (OUT / "duas.json").write_text(
+        json.dumps(
+            [
+                {
+                    "id": i,
+                    "arabic_text": ar,
+                    "title": localized_title(i, t),
+                    "translation": localized_translation(i, tr),
+                }
+                for i, t, ar, tr in DUAS
+            ],
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    print(f"Wrote {len(AZKAR)} azkar and {len(DUAS)} duas")
