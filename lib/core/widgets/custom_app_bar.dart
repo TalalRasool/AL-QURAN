@@ -17,6 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.onMenuTap,
     this.centerTitle = true,
+    this.titleMaxLines = 1,
   });
 
   final String title;
@@ -26,9 +27,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final VoidCallback? onMenuTap;
   final bool centerTitle;
+  final int titleMaxLines;
+
+  double get _toolbarHeight {
+    final lines = titleMaxLines < 1 ? 1 : titleMaxLines;
+    return lines > 1 ? 72.h : 56.h;
+  }
 
   @override
-  Size get preferredSize => Size.fromHeight(56.h);
+  Size get preferredSize => Size.fromHeight(_toolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +45,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       centerTitle: centerTitle,
       automaticallyImplyLeading: false,
-      toolbarHeight: 56.h,
+      toolbarHeight: _toolbarHeight,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
@@ -49,7 +56,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             : Brightness.light,
       ),
       leading: _buildLeading(),
-      title: Text(title, style: AppTextStyles.heading2),
+      title: Text(
+        title,
+        style: AppTextStyles.heading2,
+        maxLines: titleMaxLines < 1 ? 1 : titleMaxLines,
+        overflow: TextOverflow.ellipsis,
+        textAlign: centerTitle ? TextAlign.center : TextAlign.start,
+      ),
       actions: actions,
     );
   }

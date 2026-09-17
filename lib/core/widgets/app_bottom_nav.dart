@@ -23,7 +23,6 @@ class AppBottomNav extends StatelessWidget {
       const _NavItem(label: 'Quran', asset: AppAssets.quranIcon),
       const _NavItem(label: 'Hadith', icon: Icons.menu_book_rounded),
       const _NavItem(label: 'Audio', asset: AppAssets.audioIcon),
-      const _NavItem(label: 'Qibla', asset: AppAssets.qiblaCompass),
       const _NavItem(label: 'Profile', asset: AppAssets.profileIcon),
     ];
 
