@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -194,8 +195,13 @@ class _DuasTab extends GetView<TasbihController> {
         );
       }
 
-      return ListView.separated(
-        controller: controller.duasScrollController,
+      final initialIndex = controller.duaRevealIndex.value.clamp(
+        0,
+        controller.duas.length - 1,
+      );
+      return ScrollablePositionedList.separated(
+        initialScrollIndex: initialIndex,
+        itemScrollController: controller.duaScrollController,
         padding: EdgeInsets.only(bottom: 20.h),
         itemCount: controller.duas.length,
         separatorBuilder: (_, _) => SizedBox(height: 12.h),

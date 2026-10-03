@@ -122,12 +122,6 @@ class _ReciterList extends GetView<AudioController> {
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.cloud_download_outlined,
-                    size: 22.sp,
-                    color: AppColors.textSecondary,
-                  ),
-                  SizedBox(width: 10.w),
                   GestureDetector(
                     onTap: () => controller.playReciter(reciter),
                     child: Container(

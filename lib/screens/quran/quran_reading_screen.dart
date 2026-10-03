@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -49,7 +50,7 @@ class _ReadingBody extends GetView<QuranReadingController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (controller.isLoading.value && controller.ayahs.isEmpty) {
+      if (controller.isLoading.value) {
         return const Center(
           child: CircularProgressIndicator(color: AppColors.primary),
         );
@@ -85,9 +86,17 @@ class _ReadingBody extends GetView<QuranReadingController> {
         );
       }
 
+      final highlighted = controller.highlightedIndex.value;
+      final initialIndex = controller.revealIndexValue.value.clamp(
+        0,
+        controller.ayahs.length - 1,
+      );
       return Directionality(
         textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-        child: ListView.builder(
+        child: ScrollablePositionedList.builder(
+          initialScrollIndex: initialIndex,
+          itemScrollController: controller.itemScrollController,
+          itemPositionsListener: controller.itemPositionsListener,
           padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 28.h),
           itemCount: controller.ayahs.length,
           itemBuilder: (context, index) {
@@ -114,6 +123,7 @@ class _ReadingBody extends GetView<QuranReadingController> {
                   language: language,
                   isRtl: isRtl,
                   settings: settings,
+                  isHighlighted: index == highlighted,
                 ),
               ],
             );
@@ -130,12 +140,14 @@ class _ReadingAyahCard extends StatelessWidget {
     required this.language,
     required this.isRtl,
     required this.settings,
+    required this.isHighlighted,
   });
 
   final OfflineAyah ayah;
   final String language;
   final bool isRtl;
   final SettingsController settings;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -150,9 +162,11 @@ class _ReadingAyahCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 14.h),
       padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isHighlighted ? AppColors.mint : AppColors.surface,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(
+          color: isHighlighted ? AppColors.primary : AppColors.divider,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

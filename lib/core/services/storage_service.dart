@@ -14,6 +14,8 @@ class StorageService extends GetxService {
   static const hadithBookmarksKey = 'hadith_bookmarks';
   static const duaBookmarksKey = 'dua_bookmarks';
   static const unifiedBookmarksKey = 'unified_bookmarks';
+  static const bookmarkTombstonesKey = 'bookmark_tombstones';
+  static const bookmarkSyncUpdatedAtKey = 'bookmark_sync_updated_at';
   static const reciterIdKey = 'selected_reciter_id';
   static const reciterNameKey = 'selected_reciter_name';
   static const tasbihCountKey = 'tasbih_count';
@@ -56,6 +58,7 @@ class StorageService extends GetxService {
   final prayerNotificationsEnabled = false.obs;
   final prayerLatitude = RxnDouble();
   final prayerLongitude = RxnDouble();
+  final bookmarkRevision = 0.obs;
 
   Future<StorageService> init() async {
     _box = GetStorage();
@@ -103,17 +106,47 @@ class StorageService extends GetxService {
     return 1;
   }
 
+  int get bookmarkSyncUpdatedAtMs =>
+      asInt(_box.read(bookmarkSyncUpdatedAtKey));
+
+  Map<String, int> readBookmarkTombstones() {
+    final raw = _box.read(bookmarkTombstonesKey);
+    if (raw is! Map) return {};
+    final tombstones = <String, int>{};
+    for (final entry in raw.entries) {
+      final id = '${entry.key}'.trim();
+      final stamp = asInt(entry.value);
+      if (id.isEmpty || stamp <= 0) continue;
+      tombstones[id] = stamp;
+    }
+    return tombstones;
+  }
+
+  Future<void> saveBookmarkSync({
+    required String bookmarksJson,
+    required Map<String, int> tombstones,
+    required int updatedAtMs,
+    bool notify = true,
+  }) async {
+    await _box.write(unifiedBookmarksKey, bookmarksJson);
+    await _box.write(bookmarkTombstonesKey, tombstones);
+    await _box.write(bookmarkSyncUpdatedAtKey, updatedAtMs);
+    if (notify) bookmarkRevision.value++;
+  }
+
   Future<void> saveLastRead({
     required int surahNumber,
     required int ayahNumber,
     String source = LastRead.sourceSurah,
     int? mushafPage,
+    int? updatedAtMs,
   }) async {
     final value = LastRead(
       surahNumber: surahNumber,
       ayahNumber: ayahNumber,
       source: source,
       mushafPage: source == LastRead.sourceMushaf ? mushafPage : null,
+      updatedAtMs: updatedAtMs ?? DateTime.now().millisecondsSinceEpoch,
     );
     lastRead.value = value;
     await _box.write(lastReadKey, value.toJson());

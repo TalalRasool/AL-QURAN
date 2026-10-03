@@ -68,7 +68,9 @@ class ProfileScreen extends GetView<ProfileController> {
                     trailing: Switch.adaptive(
                       value: controller.notificationsEnabled.value,
                       activeThumbColor: AppColors.primary,
-                      onChanged: controller.toggleNotifications,
+                      onChanged: (value) {
+                        controller.toggleNotifications(value);
+                      },
                     ),
                   ),
                 ),

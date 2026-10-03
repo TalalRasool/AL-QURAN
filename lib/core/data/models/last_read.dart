@@ -6,6 +6,7 @@ class LastRead {
     required this.ayahNumber,
     this.source = sourceSurah,
     this.mushafPage,
+    this.updatedAtMs = 0,
   });
 
   static const sourceSurah = 'surah';
@@ -15,6 +16,7 @@ class LastRead {
   final int ayahNumber;
   final String source;
   final int? mushafPage;
+  final int updatedAtMs;
 
   bool get isMushaf => source == sourceMushaf;
 
@@ -22,6 +24,7 @@ class LastRead {
         'surahNumber': surahNumber,
         'ayahNumber': ayahNumber,
         'source': source,
+        'updatedAt': updatedAtMs,
         if (mushafPage != null) 'mushafPage': mushafPage,
       };
 
@@ -32,6 +35,7 @@ class LastRead {
       ayahNumber: asInt(json['ayahNumber'], fallback: 1),
       source: json['source'] as String? ?? sourceSurah,
       mushafPage: page == null ? null : asInt(page),
+      updatedAtMs: asInt(json['updatedAt']),
     );
   }
 }

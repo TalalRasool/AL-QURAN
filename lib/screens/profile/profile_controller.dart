@@ -78,8 +78,16 @@ class ProfileController extends GetxController {
     super.onClose();
   }
 
-  void toggleNotifications(bool value) =>
-      _storage.saveNotificationsEnabled(value);
+  Future<void> toggleNotifications(bool value) async {
+    await _storage.saveNotificationsEnabled(value);
+    if (!Get.isRegistered<PrayerNotificationController>()) return;
+    final prayer = Get.find<PrayerNotificationController>();
+    if (value) {
+      await prayer.refreshIfEnabled();
+    } else {
+      await prayer.pauseScheduledNotifications();
+    }
+  }
 
   Future<void> togglePrayerNotifications(bool value) async {
     final prayer = Get.find<PrayerNotificationController>();

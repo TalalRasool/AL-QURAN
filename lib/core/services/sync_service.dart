@@ -1,11 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../controllers/bookmark_controller.dart';
 import '../data/json_utils.dart';
+import '../data/models/app_bookmark.dart';
+import '../data/models/last_read.dart';
 import 'auth_service.dart';
 import 'storage_service.dart';
+import 'sync_merge.dart';
 
 class SyncService extends GetxService {
   final AuthService _auth = Get.find<AuthService>();
@@ -14,6 +19,7 @@ class SyncService extends GetxService {
   final _workers = <Worker>[];
   var _applyingRemote = false;
   var _merging = false;
+  Future<void> _libraryWrite = Future<void>.value();
 
   Future<SyncService> init() async {
     _listenForAuthChanges();
@@ -43,7 +49,7 @@ class SyncService extends GetxService {
       }),
     );
     _workers.add(
-      ever(_storage.bookmarks, (_) {
+      ever(_storage.bookmarkRevision, (_) {
         if (_applyingRemote) return;
         unawaited(pushBookmarksToCloud());
       }),
@@ -84,8 +90,8 @@ class SyncService extends GetxService {
     try {
       await pullCloudToLocal();
       await syncLocalToCloud();
-    } catch (_) {
-      // Stay on local data if the device is offline.
+    } catch (error) {
+      debugPrint('Sync merge failed: $error');
     } finally {
       _merging = false;
     }
@@ -94,14 +100,12 @@ class SyncService extends GetxService {
   Future<void> syncLocalToCloud() async {
     if (!_canSync) return;
     try {
-      await Future.wait([
-        pushProfileToCloud(),
-        pushProgressToCloud(),
-        pushBookmarksToCloud(),
-        pushTasbihToCloud(),
-      ]);
-    } catch (_) {
-      // Offline-first: local data stays; retry on next change or login.
+      await pushProfileToCloud();
+      await pushTasbihToCloud();
+      await pushProgressToCloud();
+      await pushBookmarksToCloud();
+    } catch (error) {
+      debugPrint('Sync push failed: $error');
     }
   }
 
@@ -126,58 +130,56 @@ class SyncService extends GetxService {
   Future<void> pushProgressToCloud() async {
     final uid = _uid;
     final client = _client;
-    final lastRead = _storage.lastRead.value;
-    if (uid == null || client == null || lastRead == null) return;
+    if (uid == null || client == null) return;
+    final lastRead = await _stampedLastRead();
+    if (lastRead == null) return;
 
-    await _guarded(
-      () => client.from('reading_progress').upsert({
+    await _writeLibrary(() => _guarded(() async {
+      final updatedAt = DateTime.fromMillisecondsSinceEpoch(
+        lastRead.updatedAtMs,
+        isUtc: true,
+      ).toIso8601String();
+      await client.from('user_library').upsert({
+        'user_id': uid,
+        'progress': lastRead.toJson(),
+        'progress_updated_at': updatedAt,
+      }, onConflict: 'user_id');
+      await client.from('reading_progress').upsert({
         'user_id': uid,
         'surah_number': lastRead.surahNumber,
         'ayah_number': lastRead.ayahNumber,
-      }, onConflict: 'user_id'),
-    );
+      }, onConflict: 'user_id');
+    }));
   }
 
   Future<void> pushBookmarksToCloud() async {
     final uid = _uid;
     final client = _client;
-    if (uid == null || client == null) return;
+    if (uid == null || client == null || !Get.isRegistered<BookmarkController>()) {
+      return;
+    }
 
-    await _guarded(() async {
-      final local = _storage.bookmarks.toSet();
-      final rows = await client
-          .from('bookmarks')
-          .select('surah_number')
-          .eq('user_id', uid);
-      final cloud = <int>{};
-      for (final row in rows) {
-        final number = asInt(asStringKeyMap(row)['surah_number']);
-        if (number > 0) cloud.add(number);
-      }
+    await _writeLibrary(() => _guarded(() async {
+      final document = Get.find<BookmarkController>().currentSyncDocument();
+      final updatedAt = document.updatedAtMs <= 0
+          ? DateTime.now().toUtc().toIso8601String()
+          : DateTime.fromMillisecondsSinceEpoch(
+              document.updatedAtMs,
+              isUtc: true,
+            ).toIso8601String();
+      await client.from('user_library').upsert({
+        'user_id': uid,
+        'bookmarks': document.items,
+        'tombstones': document.tombstones,
+        'bookmarks_updated_at': updatedAt,
+      }, onConflict: 'user_id');
+    }));
+  }
 
-      final toRemove = cloud.difference(local).toList();
-      final toAdd = local.difference(cloud).toList();
-
-      if (toRemove.isNotEmpty) {
-        await client
-            .from('bookmarks')
-            .delete()
-            .eq('user_id', uid)
-            .inFilter('surah_number', toRemove);
-      }
-      if (toAdd.isNotEmpty) {
-        await client.from('bookmarks').insert(
-              toAdd
-                  .map(
-                    (number) => {
-                      'user_id': uid,
-                      'surah_number': number,
-                    },
-                  )
-                  .toList(),
-            );
-      }
-    });
+  Future<void> _writeLibrary(Future<void> Function() action) {
+    final run = _libraryWrite.then((_) => action());
+    _libraryWrite = run.catchError((Object _) {});
+    return run;
   }
 
   Future<void> pushTasbihToCloud() async {
@@ -204,8 +206,8 @@ class SyncService extends GetxService {
       await _mergeProgress(client, uid);
       await _mergeBookmarks(client, uid);
       await _mergeTasbih(client, uid);
-    } catch (_) {
-      // Keep local data if the device is offline or tables are missing.
+    } catch (error) {
+      debugPrint('Sync pull failed: $error');
     } finally {
       _applyingRemote = false;
     }
@@ -239,35 +241,174 @@ class SyncService extends GetxService {
   }
 
   Future<void> _mergeProgress(SupabaseClient client, String uid) async {
-    if (_storage.lastRead.value != null) return;
+    try {
+      await _mergeProgressRow(client, uid);
+    } catch (error) {
+      debugPrint('Progress sync skipped: $error');
+    }
+  }
 
+  Future<void> _mergeProgressRow(SupabaseClient client, String uid) async {
+    final library = await _libraryRow(client, uid);
+    var cloud = _progressFromLibrary(library);
+    if (cloud == null && _storage.lastRead.value == null) {
+      cloud = await _legacyProgress(client, uid);
+    }
+    final chosen = newerProgress(_storage.lastRead.value, cloud);
+    if (chosen == null || sameProgress(_storage.lastRead.value, chosen)) return;
+    await _storage.saveLastRead(
+      surahNumber: chosen.surahNumber,
+      ayahNumber: chosen.ayahNumber <= 0 ? 1 : chosen.ayahNumber,
+      source: chosen.source,
+      mushafPage: chosen.mushafPage,
+      updatedAtMs: chosen.updatedAtMs <= 0 ? null : chosen.updatedAtMs,
+    );
+  }
+
+  Future<void> _mergeBookmarks(SupabaseClient client, String uid) async {
+    try {
+      await _mergeBookmarkRows(client, uid);
+    } catch (error) {
+      debugPrint('Bookmark sync skipped: $error');
+    }
+  }
+
+  Future<void> _mergeBookmarkRows(SupabaseClient client, String uid) async {
+    if (!Get.isRegistered<BookmarkController>()) return;
+    final bookmarks = Get.find<BookmarkController>();
+    final local = bookmarks.currentSyncDocument();
+    final library = await _libraryRow(client, uid);
+    if (library == null) {
+      if (local.items.isNotEmpty || local.tombstones.isNotEmpty) return;
+      final imported = await _legacySurahBookmarks(client, uid);
+      if (imported.isEmpty) return;
+      await bookmarks.applyCloudBookmarks(
+        items: imported,
+        tombstones: const {},
+        updatedAtMs: DateTime.now().millisecondsSinceEpoch,
+      );
+      return;
+    }
+
+    final cloud = _bookmarksFromLibrary(library);
+    final merged = mergeBookmarkDocuments(local, cloud);
+    if (!bookmarkDocumentsMatch(local, merged)) {
+      await bookmarks.applyCloudBookmarks(
+        items: merged.items,
+        tombstones: merged.tombstones,
+        updatedAtMs: merged.updatedAtMs,
+      );
+    }
+  }
+
+  Future<Map<String, dynamic>?> _libraryRow(
+    SupabaseClient client,
+    String uid,
+  ) async {
+    final row = await client
+        .from('user_library')
+        .select()
+        .eq('user_id', uid)
+        .maybeSingle();
+    if (row == null) return null;
+    return asStringKeyMap(row);
+  }
+
+  LastRead? _progressFromLibrary(Map<String, dynamic>? row) {
+    if (row == null) return null;
+    final raw = row['progress'];
+    if (raw is! Map) return null;
+    final progress = LastRead.fromJson(asStringKeyMap(raw));
+    if (progress.surahNumber <= 0) return null;
+    if (progress.updatedAtMs > 0) return progress;
+    final columnStamp = parseSyncTime(row['progress_updated_at']);
+    if (columnStamp <= 0) return progress;
+    return LastRead(
+      surahNumber: progress.surahNumber,
+      ayahNumber: progress.ayahNumber,
+      source: progress.source,
+      mushafPage: progress.mushafPage,
+      updatedAtMs: columnStamp,
+    );
+  }
+
+  Future<LastRead?> _legacyProgress(SupabaseClient client, String uid) async {
     final row = await client
         .from('reading_progress')
         .select()
         .eq('user_id', uid)
         .maybeSingle();
-    if (row == null) return;
+    if (row == null) return null;
     final map = asStringKeyMap(row);
     final surah = asInt(map['surah_number']);
+    if (surah <= 0) return null;
     final ayah = asInt(map['ayah_number']);
-    if (surah <= 0) return;
-    await _storage.saveLastRead(
+    return LastRead(
       surahNumber: surah,
       ayahNumber: ayah <= 0 ? 1 : ayah,
     );
   }
 
-  Future<void> _mergeBookmarks(SupabaseClient client, String uid) async {
+  BookmarkSyncDocument _bookmarksFromLibrary(Map<String, dynamic> row) {
+    final items = <Map<String, dynamic>>[];
+    final rawItems = row['bookmarks'];
+    if (rawItems is List) {
+      for (final item in rawItems) {
+        if (item is Map) items.add(asStringKeyMap(item));
+      }
+    }
+    final tombstones = <String, int>{};
+    final rawTombstones = row['tombstones'];
+    if (rawTombstones is Map) {
+      for (final entry in rawTombstones.entries) {
+        final id = '${entry.key}'.trim();
+        final stamp = asInt(entry.value);
+        if (id.isEmpty || stamp <= 0) continue;
+        tombstones[id] = stamp;
+      }
+    }
+    return BookmarkSyncDocument(
+      items: items,
+      tombstones: tombstones,
+      updatedAtMs: parseSyncTime(row['bookmarks_updated_at']),
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> _legacySurahBookmarks(
+    SupabaseClient client,
+    String uid,
+  ) async {
     final rows = await client
         .from('bookmarks')
         .select('surah_number')
         .eq('user_id', uid);
-    final merged = _storage.bookmarks.toSet();
+    final imported = <Map<String, dynamic>>[];
     for (final row in rows) {
       final number = asInt(asStringKeyMap(row)['surah_number']);
-      if (number > 0) merged.add(number);
+      if (number <= 0) continue;
+      imported.add(
+        AppBookmark.translation(surahNumber: number).toJson(),
+      );
     }
-    await _storage.replaceBookmarks(merged.toList()..sort());
+    return imported;
+  }
+
+  Future<LastRead?> _stampedLastRead() async {
+    final current = _storage.lastRead.value;
+    if (current == null) return null;
+    if (current.updatedAtMs > 0) return current;
+    _applyingRemote = true;
+    try {
+      await _storage.saveLastRead(
+        surahNumber: current.surahNumber,
+        ayahNumber: current.ayahNumber,
+        source: current.source,
+        mushafPage: current.mushafPage,
+      );
+    } finally {
+      _applyingRemote = false;
+    }
+    return _storage.lastRead.value;
   }
 
   Future<void> _mergeTasbih(SupabaseClient client, String uid) async {
@@ -297,8 +438,8 @@ class SyncService extends GetxService {
     if (!_canSync) return;
     try {
       await action();
-    } catch (_) {
-      // Offline-first: local data stays; cloud retry happens on next login/change.
+    } catch (error) {
+      debugPrint('Sync request failed: $error');
     }
   }
 

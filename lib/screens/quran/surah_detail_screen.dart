@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -74,7 +75,15 @@ class SurahDetailScreen extends GetView<SurahDetailController> {
 
     return Stack(
       children: [
-        ListView.builder(
+        ScrollablePositionedList.builder(
+          initialScrollIndex: controller.ayahs.isEmpty
+              ? 0
+              : controller.revealIndexValue.value.clamp(
+                  0,
+                  controller.ayahs.length - 1,
+                ),
+          itemScrollController: controller.itemScrollController,
+          itemPositionsListener: controller.itemPositionsListener,
           padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 120.h),
           itemCount: controller.ayahs.length,
           itemBuilder: (context, index) {

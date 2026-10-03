@@ -202,9 +202,9 @@ class HadithDbHelper {
   }
 
   static int? extractHadithNumber(String query) {
-    final match = RegExp(r'\d+').firstMatch(query.trim());
-    if (match == null) return null;
-    return int.tryParse(match.group(0)!);
+    final trimmed = query.trim();
+    if (!RegExp(r'^\d+$').hasMatch(trimmed)) return null;
+    return int.tryParse(trimmed);
   }
 
   static String _escapeLike(String value) {

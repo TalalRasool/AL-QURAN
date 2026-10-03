@@ -209,7 +209,6 @@ class ApiQuranRepositoryImpl implements QuranRepository {
   @override
   Future<void> clearAyahCaches() async {
     _translationSurahs.clear();
-    await _box.remove(_dailyVerseCacheKey);
   }
 
   Future<DailyVerse> _verseAtGlobalNumber(int globalNumber) async {

@@ -9,6 +9,7 @@ import '../data/models/app_bookmark.dart';
 import '../data/quran_repository.dart';
 import '../routes/app_routes.dart';
 import '../services/storage_service.dart';
+import '../services/sync_merge.dart';
 import '../widgets/bookmark_icon_button.dart';
 
 class BookmarkController extends GetxService {
@@ -18,9 +19,11 @@ class BookmarkController extends GetxService {
   Worker? _legacyWorker;
   bool _syncingLegacy = false;
   var _didLoad = false;
+  final _tombstones = <String, int>{};
 
   Future<BookmarkController> init() async {
     _storage = Get.find<StorageService>();
+    _tombstones.addAll(_storage.readBookmarkTombstones());
     _loadFromStorage();
     await _migrateLegacyIfNeeded();
     _legacyWorker = ever(_storage.bookmarks, (_) {
@@ -97,12 +100,49 @@ class BookmarkController extends GetxService {
 
   bool isDuaBookmarked(String duaId) => has(AppBookmark.duaId(duaId));
 
+  BookmarkSyncDocument currentSyncDocument() {
+    return BookmarkSyncDocument(
+      items: [
+        for (final item in items) item.toJson(),
+      ],
+      tombstones: Map<String, int>.from(_tombstones),
+      updatedAtMs: _storage.bookmarkSyncUpdatedAtMs,
+    );
+  }
+
+  Future<void> applyCloudBookmarks({
+    required List<Map<String, dynamic>> items,
+    required Map<String, int> tombstones,
+    required int updatedAtMs,
+  }) async {
+    final decoded = [
+      for (final item in items) AppBookmark.fromJson(item),
+    ].where((item) => item.id.isNotEmpty).toList();
+    this.items.assignAll(decoded);
+    _tombstones
+      ..clear()
+      ..addAll(tombstones);
+    await _storage.saveBookmarkSync(
+      bookmarksJson: encodeBookmarksJson(),
+      tombstones: _tombstones,
+      updatedAtMs: updatedAtMs,
+      notify: false,
+    );
+    await _writeLegacy();
+  }
+
   Future<bool> toggle(AppBookmark bookmark) async {
     final added = !has(bookmark.id);
     if (added) {
       items.insert(0, bookmark);
+      _tombstones.remove(bookmark.id);
     } else {
+      final existing = items.cast<AppBookmark?>().firstWhere(
+        (item) => item?.id == bookmark.id,
+        orElse: () => null,
+      );
       items.removeWhere((item) => item.id == bookmark.id);
+      _rememberRemoval(existing ?? bookmark);
     }
     await _persist();
     showBookmarkSnackbar(added: added);
@@ -111,8 +151,18 @@ class BookmarkController extends GetxService {
 
   Future<void> remove(String id) async {
     if (!has(id)) return;
+    final existing = items.cast<AppBookmark?>().firstWhere(
+      (item) => item?.id == id,
+      orElse: () => null,
+    );
     items.removeWhere((item) => item.id == id);
+    if (existing != null) _rememberRemoval(existing);
     await _persist();
+  }
+
+  void _rememberRemoval(AppBookmark item) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    _tombstones[item.id] = now > item.createdAt ? now : item.createdAt + 1;
   }
 
   Future<void> open(AppBookmark bookmark) async {
@@ -346,7 +396,11 @@ class BookmarkController extends GetxService {
   }
 
   Future<void> _persistUnifiedOnly() {
-    return _storage.saveUnifiedBookmarksJson(encodeBookmarksJson());
+    return _storage.saveBookmarkSync(
+      bookmarksJson: encodeBookmarksJson(),
+      tombstones: _tombstones,
+      updatedAtMs: DateTime.now().millisecondsSinceEpoch,
+    );
   }
 
   Future<void> _writeLegacy() async {

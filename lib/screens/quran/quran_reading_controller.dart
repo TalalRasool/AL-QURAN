@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/controllers/settings_controller.dart';
 import '../../core/data/json_utils.dart';
@@ -9,6 +12,7 @@ import '../../core/data/quran_repository.dart';
 import '../../core/services/storage_service.dart';
 import '../../services/database_helper.dart';
 import '../study/study_models.dart';
+import 'reading_position.dart';
 
 /// Reading Mode: Arabic ayah + full translation from `ayahs` only.
 /// Does not load `ayah_words` (no word-by-word).
@@ -20,9 +24,16 @@ class QuranReadingController extends GetxController {
   final languageCode = 'en'.obs;
   final ayahs = <OfflineAyah>[].obs;
   final surahs = <Surah>[].obs;
+  final revealIndexValue = 0.obs;
+  final highlightedIndex = 0.obs;
+
+  final itemScrollController = ItemScrollController();
+  final itemPositionsListener = ItemPositionsListener.create();
 
   int _loadId = 0;
+  int _armedIndex = -1;
   Worker? _languageWorker;
+  Timer? _saveTimer;
 
   Surah? get currentSurah {
     for (final surah in surahs) {
@@ -53,12 +64,15 @@ class QuranReadingController extends GetxController {
         (_) => _syncLanguage(),
       );
     }
+    itemPositionsListener.itemPositions.addListener(_onItemPositions);
     _loadSurahList();
     _openFromArgs();
   }
 
   @override
   void onClose() {
+    itemPositionsListener.itemPositions.removeListener(_onItemPositions);
+    _saveTimer?.cancel();
     _languageWorker?.dispose();
     super.onClose();
   }
@@ -73,11 +87,19 @@ class QuranReadingController extends GetxController {
   void _openFromArgs() {
     final juz = _juzFromArgs();
     if (juz != null) {
-      loadJuz(juz);
+      loadJuz(juz, useRouteAyah: true);
       return;
     }
     final surah = _surahFromArgs() ?? 1;
-    loadSurah(surah);
+    loadSurah(surah, useRouteAyah: true);
+  }
+
+  int? _ayahFromArgs() {
+    final args = Get.arguments;
+    if (args is! Map || !args.containsKey('ayah')) return null;
+    final ayah = asInt(args['ayah']);
+    if (ayah < 1) return null;
+    return ayah;
   }
 
   int? _surahFromArgs() {
@@ -115,10 +137,13 @@ class QuranReadingController extends GetxController {
     return 'Surah $number';
   }
 
-  Future<void> loadSurah(int surahNumber) async {
+  Future<void> loadSurah(
+    int surahNumber, {
+    bool useRouteAyah = false,
+  }) async {
     selectedJuz.value = null;
     selectedSurah.value = surahNumber;
-    await _loadAyahs(
+    final parsed = await _loadAyahs(
       () async {
         final db = await DatabaseHelper.instance.database;
         return db.query(
@@ -130,10 +155,18 @@ class QuranReadingController extends GetxController {
       },
       emptyMessage: 'Could not load this surah from the offline database.',
     );
-    await _saveLastRead(surahNumber: surahNumber, ayahNumber: 1);
+    if (parsed == null || parsed.isEmpty || isClosed) return;
+    await _revealParsed(
+      parsed,
+      preferredSurah: surahNumber,
+      preferredAyah: useRouteAyah ? _ayahFromArgs() : null,
+    );
   }
 
-  Future<void> loadJuz(int juzNumber) async {
+  Future<void> loadJuz(
+    int juzNumber, {
+    bool useRouteAyah = false,
+  }) async {
     final range = JuzRanges.of(juzNumber);
     if (range == null || range.length != 4) return;
 
@@ -144,7 +177,7 @@ class QuranReadingController extends GetxController {
 
     selectedJuz.value = juzNumber;
     selectedSurah.value = startSurah;
-    await _loadAyahs(
+    final parsed = await _loadAyahs(
       () async {
         final db = await DatabaseHelper.instance.database;
         return db.rawQuery(
@@ -162,7 +195,66 @@ class QuranReadingController extends GetxController {
       },
       emptyMessage: 'Could not load this juz from the offline database.',
     );
-    await _saveLastRead(surahNumber: startSurah, ayahNumber: startAyah);
+    if (parsed == null || parsed.isEmpty || isClosed) return;
+    await _revealParsed(
+      parsed,
+      preferredSurah: useRouteAyah ? _surahFromArgs() : null,
+      preferredAyah: useRouteAyah ? _ayahFromArgs() : null,
+    );
+  }
+
+  Future<void> _revealParsed(
+    List<OfflineAyah> parsed, {
+    int? preferredSurah,
+    int? preferredAyah,
+  }) async {
+    final saved = Get.isRegistered<StorageService>()
+        ? Get.find<StorageService>().lastRead.value
+        : null;
+    final index = revealIndex(
+      [
+        for (final ayah in parsed)
+          (surahNumber: ayah.surahNumber, ayahNumber: ayah.ayahNumber),
+      ],
+      preferredSurah: preferredSurah,
+      preferredAyah: preferredAyah,
+      saved: saved,
+    );
+    final ayah = parsed[index];
+    _armedIndex = index;
+    revealIndexValue.value = index;
+    highlightedIndex.value = index;
+    await _saveLastRead(
+      surahNumber: ayah.surahNumber,
+      ayahNumber: ayah.ayahNumber,
+    );
+    if (!isClosed) isLoading.value = false;
+  }
+
+  void _onItemPositions() {
+    if (isClosed || ayahs.isEmpty) return;
+    final positions = itemPositionsListener.itemPositions.value;
+    ItemPosition? top;
+    for (final position in positions) {
+      if (position.itemTrailingEdge <= 0.02) continue;
+      if (top == null || position.itemLeadingEdge < top.itemLeadingEdge) {
+        top = position;
+      }
+    }
+    if (top == null || top.index < 0 || top.index >= ayahs.length) return;
+    if (_armedIndex >= 0 && top.index != _armedIndex) return;
+    _armedIndex = -1;
+    if (highlightedIndex.value == top.index) return;
+    highlightedIndex.value = top.index;
+    final ayah = ayahs[top.index];
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 400), () {
+      if (isClosed) return;
+      _saveLastRead(
+        surahNumber: ayah.surahNumber,
+        ayahNumber: ayah.ayahNumber,
+      );
+    });
   }
 
   Future<void> _saveLastRead({
@@ -178,7 +270,7 @@ class QuranReadingController extends GetxController {
     } catch (_) {}
   }
 
-  Future<void> _loadAyahs(
+  Future<List<OfflineAyah>?> _loadAyahs(
     Future<List<Map<String, dynamic>>> Function() query, {
     required String emptyMessage,
   }) async {
@@ -189,22 +281,24 @@ class QuranReadingController extends GetxController {
 
     try {
       final ayahRows = await query();
-      if (loadId != _loadId) return;
+      if (loadId != _loadId || isClosed) return null;
 
       final parsed = [
         for (final row in ayahRows) OfflineAyah.fromMap(row),
       ];
       if (parsed.isEmpty) {
         errorMessage.value = emptyMessage;
-        return;
+        isLoading.value = false;
+        return [];
       }
       ayahs.assignAll(parsed);
+      return parsed;
     } catch (error) {
-      if (loadId != _loadId) return;
+      if (loadId != _loadId || isClosed) return null;
       errorMessage.value = emptyMessage;
+      isLoading.value = false;
       debugPrint('Quran reading load failed: $error');
-    } finally {
-      if (loadId == _loadId) isLoading.value = false;
+      return [];
     }
   }
 }

@@ -20,21 +20,42 @@ class MainNavigationScreen extends GetView<NavigationController> {
       Get.find<SettingsController>().isDarkMode.value;
       return Scaffold(
         backgroundColor: AppColors.background,
-        body: IndexedStack(
-          index: controller.currentIndex.value,
-          children: [
-            HomeScreen(),
-            QuranScreen(),
-            HadithBooksScreen(),
-            AudioScreen(),
-            ProfileScreen(),
-          ],
-        ),
+        body: _PersistentTabs(index: controller.currentIndex.value),
         bottomNavigationBar: AppBottomNav(
           currentIndex: controller.currentIndex.value,
           onTap: controller.changeTab,
         ),
       );
     });
+  }
+}
+
+class _PersistentTabs extends StatefulWidget {
+  const _PersistentTabs({required this.index});
+
+  final int index;
+
+  @override
+  State<_PersistentTabs> createState() => _PersistentTabsState();
+}
+
+class _PersistentTabsState extends State<_PersistentTabs> {
+  final _built = <int>{0};
+
+  @override
+  Widget build(BuildContext context) {
+    _built.add(widget.index);
+    return IndexedStack(
+      index: widget.index,
+      children: [
+        const HomeScreen(),
+        _built.contains(1) ? const QuranScreen() : const SizedBox.shrink(),
+        _built.contains(2)
+            ? const HadithBooksScreen()
+            : const SizedBox.shrink(),
+        _built.contains(3) ? const AudioScreen() : const SizedBox.shrink(),
+        _built.contains(4) ? const ProfileScreen() : const SizedBox.shrink(),
+      ],
+    );
   }
 }

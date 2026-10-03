@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:hijri/hijri_calendar.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/data/models/daily_verse.dart';
 import '../../core/data/models/surah.dart';
@@ -182,13 +183,22 @@ class HomeController extends GetxController {
     );
   }
 
-  void shareDailyVerse() {
+  Future<void> shareDailyVerse() async {
     final verse = dailyVerse.value;
     if (verse == null) return;
-    Get.snackbar(
-      'Daily Verse',
-      '${verse.translation}\n(${verse.reference})',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    final text = [
+      verse.arabic,
+      verse.translation,
+      '(${verse.reference})',
+    ].where((line) => line.trim().isNotEmpty).join('\n\n');
+    try {
+      await SharePlus.instance.share(ShareParams(text: text));
+    } catch (_) {
+      Get.snackbar(
+        'Daily Verse',
+        text,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }

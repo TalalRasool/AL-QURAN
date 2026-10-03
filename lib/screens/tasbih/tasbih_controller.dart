@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/constants/app_assets.dart';
 import '../../core/controllers/bookmark_controller.dart';
@@ -24,7 +24,8 @@ class TasbihController extends GetxController {
   final isContentLoading = false.obs;
   final contentError = RxnString();
   final highlightDuaId = ''.obs;
-  final duasScrollController = ScrollController();
+  final duaRevealIndex = 0.obs;
+  final duaScrollController = ItemScrollController();
 
   final StorageService _storage = Get.find<StorageService>();
   Worker? _countWorker;
@@ -48,7 +49,6 @@ class TasbihController extends GetxController {
   @override
   void onClose() {
     _countWorker?.dispose();
-    duasScrollController.dispose();
     super.onClose();
   }
 
@@ -126,20 +126,13 @@ class TasbihController extends GetxController {
 
   void _scrollToHighlightedDua() {
     final id = highlightDuaId.value;
-    if (id.isEmpty) return;
+    if (id.isEmpty || duas.isEmpty) return;
     final index = duas.indexWhere((dua) => dua.id == id);
     if (index < 0) return;
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (!duasScrollController.hasClients) return;
-      final offset = (index * 220.0).clamp(
-        0,
-        duasScrollController.position.maxScrollExtent,
-      );
-      duasScrollController.animateTo(
-        offset.toDouble(),
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOut,
-      );
+    duaRevealIndex.value = index;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!duaScrollController.isAttached) return;
+      duaScrollController.jumpTo(index: index, alignment: 0.08);
     });
   }
 

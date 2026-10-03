@@ -1,13 +1,18 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/controllers/bookmark_controller.dart';
 import '../../core/controllers/hifz_mode_mixin.dart';
 import '../../core/data/models/app_bookmark.dart';
 import '../../core/data/models/ayah.dart';
 import '../../core/data/models/surah.dart';
+import '../../core/data/json_utils.dart';
 import '../../core/data/quran_repository.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/services/storage_service.dart';
+import 'reading_position.dart';
 
 class SurahDetailController extends GetxController with HifzModeMixin {
   final isLoading = false.obs;
@@ -16,23 +21,32 @@ class SurahDetailController extends GetxController with HifzModeMixin {
   final ayahs = <Ayah>[].obs;
   final highlightedAyah = 1.obs;
   final highlightedSurah = 0.obs;
+  final revealIndexValue = 0.obs;
   final juzNumber = RxnInt();
+
+  final itemScrollController = ItemScrollController();
+  final itemPositionsListener = ItemPositionsListener.create();
 
   final QuranRepository _quran = Get.find<QuranRepository>();
   final StorageService _storage = Get.find<StorageService>();
   final AudioService _audio = Get.find<AudioService>();
   Worker? _translationWorker;
+  Timer? _saveTimer;
+  int _armedIndex = -1;
 
   @override
   void onInit() {
     super.onInit();
     juzNumber.value = _juzFromArgs;
+    itemPositionsListener.itemPositions.addListener(_onItemPositions);
     _translationWorker = ever(_storage.selectedTranslationId, (_) => load());
     load();
   }
 
   @override
   void onClose() {
+    itemPositionsListener.itemPositions.removeListener(_onItemPositions);
+    _saveTimer?.cancel();
     _translationWorker?.dispose();
     super.onClose();
   }
@@ -80,36 +94,33 @@ class SurahDetailController extends GetxController with HifzModeMixin {
         await _loadSurah(number);
       }
     } catch (_) {
+      if (isClosed) return;
       errorMessage.value = isJuzMode
           ? 'Unable to load this juz from the offline Quran data.'
           : 'Unable to load this surah from the offline Quran data.';
     } finally {
-      isLoading.value = false;
+      if (!isClosed) isLoading.value = false;
     }
   }
 
   Future<void> _loadSurah(int number) async {
     final loadedSurah = await _quran.getSurahByNumber(number);
+    if (isClosed) return;
     final loadedAyahs = await _quran.getAyahs(loadedSurah.number);
+    if (isClosed) return;
     surah.value = loadedSurah;
     ayahs.assignAll(loadedAyahs);
-
-    highlightedSurah.value = loadedSurah.number;
-    highlightedAyah.value =
-        loadedAyahs.isNotEmpty ? loadedAyahs.first.number : 1;
-    final saved = _storage.lastRead.value;
-    if (saved != null && saved.surahNumber == loadedSurah.number) {
-      highlightedAyah.value = saved.ayahNumber;
-    }
-
-    await _storage.saveLastRead(
-      surahNumber: loadedSurah.number,
-      ayahNumber: highlightedAyah.value,
+    await _reveal(
+      loadedAyahs,
+      fallbackSurah: loadedSurah.number,
+      preferredSurah: loadedSurah.number,
+      preferredAyah: _ayahFromArgs(),
     );
   }
 
   Future<void> _loadJuz(int number) async {
     final loadedAyahs = await _quran.getJuzAyahs(number);
+    if (isClosed) return;
     if (loadedAyahs.isEmpty) {
       throw StateError('Juz $number has no ayahs');
     }
@@ -118,12 +129,92 @@ class SurahDetailController extends GetxController with HifzModeMixin {
     final first = loadedAyahs.first;
     final startSurah = first.surahNumber > 0 ? first.surahNumber : 1;
     surah.value = await _quran.getSurahByNumber(startSurah);
-    highlightedSurah.value = startSurah;
-    highlightedAyah.value = first.number;
-    await _storage.saveLastRead(
-      surahNumber: startSurah,
-      ayahNumber: first.number,
+    if (isClosed) return;
+    await _reveal(
+      loadedAyahs,
+      fallbackSurah: startSurah,
+      preferredSurah: _surahFromArgs(),
+      preferredAyah: _ayahFromArgs(),
     );
+  }
+
+  int? _ayahFromArgs() {
+    final args = Get.arguments;
+    if (args is! Map || !args.containsKey('ayah')) return null;
+    final ayah = asInt(args['ayah']);
+    if (ayah < 1) return null;
+    return ayah;
+  }
+
+  int? _surahFromArgs() {
+    final args = Get.arguments;
+    if (args is! Map) return null;
+    final number = asInt(args['surah']);
+    if (number < 1 || number > 114) return null;
+    return number;
+  }
+
+  Future<void> _reveal(
+    List<Ayah> loadedAyahs, {
+    required int fallbackSurah,
+    int? preferredSurah,
+    int? preferredAyah,
+  }) async {
+    final index = revealIndex(
+      [
+        for (final ayah in loadedAyahs)
+          (
+            surahNumber: ayah.surahNumber > 0 ? ayah.surahNumber : fallbackSurah,
+            ayahNumber: ayah.number,
+          ),
+      ],
+      preferredSurah: preferredSurah,
+      preferredAyah: preferredAyah,
+      saved: _storage.lastRead.value,
+    );
+    final ayah = loadedAyahs[index];
+    final surahNumber =
+        ayah.surahNumber > 0 ? ayah.surahNumber : fallbackSurah;
+    highlightedSurah.value = surahNumber;
+    highlightedAyah.value = ayah.number;
+    _armedIndex = index;
+    revealIndexValue.value = index;
+    await _storage.saveLastRead(
+      surahNumber: surahNumber,
+      ayahNumber: ayah.number,
+    );
+  }
+
+  void _onItemPositions() {
+    if (isClosed || ayahs.isEmpty) return;
+    final positions = itemPositionsListener.itemPositions.value;
+    ItemPosition? top;
+    for (final position in positions) {
+      if (position.itemTrailingEdge <= 0.02) continue;
+      if (top == null || position.itemLeadingEdge < top.itemLeadingEdge) {
+        top = position;
+      }
+    }
+    if (top == null || top.index < 0 || top.index >= ayahs.length) return;
+    if (_armedIndex >= 0 && top.index != _armedIndex) return;
+    _armedIndex = -1;
+    final ayah = ayahs[top.index];
+    final surahNumber =
+        ayah.surahNumber > 0 ? ayah.surahNumber : (surah.value?.number ?? 0);
+    if (highlightedAyah.value == ayah.number &&
+        highlightedSurah.value == surahNumber) {
+      return;
+    }
+    highlightedAyah.value = ayah.number;
+    highlightedSurah.value = surahNumber;
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 400), () {
+      if (isClosed || surahNumber < 1) return;
+      _storage.saveLastRead(
+        surahNumber: surahNumber,
+        ayahNumber: ayah.number,
+      );
+    });
   }
 
   bool get isRtlTranslation =>

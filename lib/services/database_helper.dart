@@ -15,9 +15,21 @@ class DatabaseHelper {
   static const assetPath = 'assets/databases/quran_5_languages_wbw_full.db';
   static const fileName = 'quran_5_languages_wbw_full.db';
 
+  /// Bump this whenever `quran_5_languages_wbw_full.db` in assets must replace
+  /// the copy already stored on the device.
+  static const schemaVersion = 1;
+
   Database? _db;
+  Future<Database>? _opening;
   static bool _ffiReady = false;
   String? initError;
+
+  static bool needsAssetCopy({
+    required bool databaseFileExists,
+    required bool versionMarkerExists,
+  }) {
+    return !(databaseFileExists && versionMarkerExists);
+  }
 
   Future<DatabaseHelper> init() async {
     try {
@@ -33,8 +45,17 @@ class DatabaseHelper {
   Future<Database> get database async {
     final existing = _db;
     if (existing != null && existing.isOpen) return existing;
-    _db = await _open();
-    return _db!;
+    final inFlight = _opening;
+    if (inFlight != null) return inFlight;
+    final opening = _open();
+    _opening = opening;
+    try {
+      final opened = await opening;
+      _db = opened;
+      return opened;
+    } finally {
+      if (identical(_opening, opening)) _opening = null;
+    }
   }
 
   Future<Database> _open() async {
@@ -47,22 +68,44 @@ class DatabaseHelper {
   }
 
   Future<void> _copyFromAssetsIfNeeded(String path) async {
-    if (await databaseExists(path)) {
-      final file = File(path);
-      if (file.existsSync() && file.lengthSync() > 0) return;
+    final file = File(path);
+    final marker = File('$path.v$schemaVersion');
+    final fileReady = file.existsSync() && file.lengthSync() > 0;
+    if (!needsAssetCopy(
+      databaseFileExists: fileReady,
+      versionMarkerExists: marker.existsSync(),
+    )) {
+      return;
     }
 
     if (_db != null && _db!.isOpen) {
       await _db!.close();
       _db = null;
     }
+    if (file.existsSync()) {
+      await file.delete();
+    }
+    await _deleteStaleMarkers(file.parent);
 
     final data = await rootBundle.load(assetPath);
     final bytes = data.buffer.asUint8List(
       data.offsetInBytes,
       data.lengthInBytes,
     );
-    await File(path).writeAsBytes(bytes, flush: true);
+    await file.writeAsBytes(bytes, flush: true);
+    await marker.writeAsString('$schemaVersion', flush: true);
+  }
+
+  Future<void> _deleteStaleMarkers(Directory directory) async {
+    if (!directory.existsSync()) return;
+    await for (final entity in directory.list()) {
+      if (entity is! File) continue;
+      final name = p.basename(entity.path);
+      if (name.startsWith('$fileName.v') &&
+          name != '$fileName.v$schemaVersion') {
+        await entity.delete();
+      }
+    }
   }
 
   static void _ensureFfi() {

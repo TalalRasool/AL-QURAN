@@ -13,14 +13,15 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/storage_service.dart';
 
-class PrayerNotificationController extends GetxService {
+class PrayerNotificationController extends GetxService
+    with WidgetsBindingObserver {
   static const _channelId = 'prayer_times';
   static const _channelName = 'Prayer Times';
   static const _channelDescription =
       'Reminders 15 minutes before each prayer';
   static const _advance = Duration(minutes: 15);
-  static const _todayIds = [1, 2, 3, 4, 5];
-  static const _tomorrowIds = [6, 7, 8, 9, 10];
+  static const _daysToSchedule = 7;
+  static const _prayersPerDay = 5;
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -29,24 +30,70 @@ class PrayerNotificationController extends GetxService {
   final isBusy = false.obs;
   var _initialized = false;
   var _timeZoneReady = false;
+  var _observingLifecycle = false;
+  Timer? _refreshTimer;
 
   RxBool get isEnabled => _storage.prayerNotificationsEnabled;
 
   Future<PrayerNotificationController> init() async {
     try {
       _configureLocalTimeZone();
+      _ensureLifecycleObserver();
+      _refreshTimer ??= Timer.periodic(const Duration(hours: 12), (_) {
+        unawaited(refreshIfEnabled());
+      });
       await _ensureNotificationsInitialized();
-      if (isEnabled.value) {
-        unawaited(_rescheduleFromSavedLocation());
-      }
+      unawaited(refreshIfEnabled());
     } catch (_) {}
     return this;
+  }
+
+  @override
+  void onClose() {
+    _refreshTimer?.cancel();
+    if (_observingLifecycle) {
+      WidgetsBinding.instance.removeObserver(this);
+      _observingLifecycle = false;
+    }
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(refreshIfEnabled());
+    }
+  }
+
+  void _ensureLifecycleObserver() {
+    if (_observingLifecycle) return;
+    WidgetsBinding.instance.addObserver(this);
+    _observingLifecycle = true;
+  }
+
+  Future<void> refreshIfEnabled() async {
+    if (!isEnabled.value || !_storage.notificationsEnabled.value) {
+      if (!_storage.notificationsEnabled.value) {
+        await pauseScheduledNotifications();
+      }
+      return;
+    }
+    await _rescheduleFromSavedLocation();
+  }
+
+  Future<void> pauseScheduledNotifications() async {
+    try {
+      await _cancelPrayerNotifications();
+    } catch (_) {}
   }
 
   Future<void> requestLocationAndEnableNotifications() async {
     if (isBusy.value) return;
     isBusy.value = true;
     try {
+      if (!_storage.notificationsEnabled.value) {
+        await _storage.saveNotificationsEnabled(true);
+      }
       await _ensureNotificationsInitialized();
       if (!await _requestNotificationPermissions()) {
         await disableNotifications(silent: true);
@@ -96,9 +143,15 @@ class PrayerNotificationController extends GetxService {
     }
   }
 
-  Future<void> schedulePrayerNotifications(PrayerTimes prayerTimes) async {
+  Future<void> schedulePrayerNotifications(
+    PrayerTimes prayerTimes, {
+    required int dayOffset,
+  }) async {
     await _ensureNotificationsInitialized();
-    final ids = _idsFor(prayerTimes);
+    final ids = [
+      for (var index = 0; index < _prayersPerDay; index++)
+        dayOffset * _prayersPerDay + index + 1,
+    ];
     final prayerDay = _prayerDay(prayerTimes);
     final now = DateTime.now();
     final isToday = prayerDay.year == now.year &&
@@ -164,19 +217,17 @@ class PrayerNotificationController extends GetxService {
   Future<void> _scheduleForCoordinates(Coordinates coordinates) async {
     await _cancelPrayerNotifications();
     final params = _calculationParameters();
-    final today = PrayerTimes.today(coordinates, params);
-    final tomorrowDate = DateTime.now().add(const Duration(days: 1));
-    final tomorrow = PrayerTimes(
-      coordinates,
-      DateComponents(
-        tomorrowDate.year,
-        tomorrowDate.month,
-        tomorrowDate.day,
-      ),
-      params,
-    );
-    await schedulePrayerNotifications(today);
-    await schedulePrayerNotifications(tomorrow);
+    final start = DateTime.now();
+    for (var offset = 0; offset < _daysToSchedule; offset++) {
+      final date = DateTime(start.year, start.month, start.day)
+          .add(Duration(days: offset));
+      final times = PrayerTimes(
+        coordinates,
+        DateComponents(date.year, date.month, date.day),
+        params,
+      );
+      await schedulePrayerNotifications(times, dayOffset: offset);
+    }
   }
 
   Future<void> _rescheduleFromSavedLocation() async {
@@ -329,17 +380,10 @@ class PrayerNotificationController extends GetxService {
   }
 
   Future<void> _cancelPrayerNotifications() async {
-    for (final id in [..._todayIds, ..._tomorrowIds]) {
+    final count = _daysToSchedule * _prayersPerDay;
+    for (var id = 1; id <= count; id++) {
       await _plugin.cancel(id);
     }
-  }
-
-  List<int> _idsFor(PrayerTimes prayerTimes) {
-    final day = _prayerDay(prayerTimes);
-    final today = DateTime.now();
-    final isToday =
-        day.year == today.year && day.month == today.month && day.day == today.day;
-    return isToday ? _todayIds : _tomorrowIds;
   }
 
   DateTime _prayerDay(PrayerTimes prayerTimes) {
