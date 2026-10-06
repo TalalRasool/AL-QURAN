@@ -2,6 +2,7 @@ import 'package:alquran/core/data/models/last_read.dart';
 import 'package:alquran/core/services/sync_merge.dart';
 import 'package:alquran/features/hadith/data/hadith_db_helper.dart';
 import 'package:alquran/screens/quran/reading_position.dart';
+import 'package:alquran/screens/study/study_models.dart';
 import 'package:alquran/services/database_helper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -103,6 +104,19 @@ void main() {
       ),
       1,
     );
+  });
+
+  test('persian is a supported right-to-left offline language', () {
+    expect(OfflineLanguage.normalize('fa'), 'fa');
+    expect(OfflineLanguage.fullColumn('fa'), 'persian_full');
+    expect(OfflineLanguage.wordColumn('fa'), 'persian');
+    expect(OfflineLanguage.isRtl('fa'), isTrue);
+    expect(OfflineLanguage.isRtl('ur'), isTrue);
+    expect(OfflineLanguage.isRtl('ar'), isTrue);
+    expect(OfflineLanguage.isRtl('en'), isFalse);
+    expect(OfflineLanguage.ayahLabel('fa'), 'آیه');
+    expect(OfflineLanguage.ayahSelectSql.contains('persian_full'), isTrue);
+    expect(OfflineLanguage.wordSelectColumns, contains('persian'));
   });
 
   test('quran database is recopied until the version marker exists', () {

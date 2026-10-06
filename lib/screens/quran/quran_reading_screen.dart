@@ -230,6 +230,12 @@ class _ReadingAyahCard extends StatelessWidget {
           color: color,
           fontWeight: FontWeight.w600,
         );
+      case 'fa':
+        return GoogleFonts.notoNaskhArabic(
+          fontSize: 12.sp,
+          color: color,
+          fontWeight: FontWeight.w600,
+        );
       default:
         return AppTextStyles.bodySmall.copyWith(
           color: color,

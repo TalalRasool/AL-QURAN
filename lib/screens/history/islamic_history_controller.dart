@@ -7,6 +7,7 @@ import '../../core/constants/app_assets.dart';
 import '../../core/controllers/settings_controller.dart';
 import '../../core/data/models/seerah.dart';
 import '../../core/services/storage_service.dart';
+import '../study/study_models.dart';
 
 class IslamicHistoryController extends GetxController {
   static const screenTitles = {
@@ -15,6 +16,7 @@ class IslamicHistoryController extends GetxController {
     'hi': 'इस्लामी इतिहास',
     'bn': 'ইসলামি ইতিহাস',
     'id': 'Sejarah Islam',
+    'fa': 'تاریخ اسلام',
   };
 
   static const tabLabelsByLang = {
@@ -23,6 +25,7 @@ class IslamicHistoryController extends GetxController {
     'hi': ['सीरत', 'सहाबा', 'ग़ज़वात'],
     'bn': ['সিরাত', 'সাহাবা', 'গাজওয়া'],
     'id': ['Sirah', 'Sahabat', 'Ghazwah'],
+    'fa': ['سیره', 'صحابه', 'غزوات'],
   };
 
   static const _emptyByTab = {
@@ -32,6 +35,7 @@ class IslamicHistoryController extends GetxController {
       'hi': 'सीरत के अध्याय नहीं मिले।',
       'bn': 'সিরাত অধ্যায় পাওয়া যায়নি।',
       'id': 'Bab sirah tidak ditemukan.',
+      'fa': 'بابی از سیره پیدا نشد.',
     },
     1: {
       'en': 'No Sahaba entries were found.',
@@ -39,6 +43,7 @@ class IslamicHistoryController extends GetxController {
       'hi': 'सहाबा की जानकारी नहीं मिली।',
       'bn': 'সাহাবা তথ্য পাওয়া যায়নি।',
       'id': 'Data sahabat tidak ditemukan.',
+      'fa': 'اطلاعاتی از صحابه پیدا نشد.',
     },
     2: {
       'en': 'No Ghazawat entries were found.',
@@ -46,6 +51,7 @@ class IslamicHistoryController extends GetxController {
       'hi': 'ग़ज़वात की जानकारी नहीं मिली।',
       'bn': 'গাজওয়া তথ্য পাওয়া যায়নি।',
       'id': 'Data ghazwah tidak ditemukan.',
+      'fa': 'اطلاعاتی از غزوات پیدا نشد.',
     },
   };
 
@@ -66,7 +72,7 @@ class IslamicHistoryController extends GetxController {
     return Get.find<SettingsController>().translationLanguageCode;
   }
 
-  bool get isRtl => languageCode == 'ur';
+  bool get isRtl => OfflineLanguage.isRtl(languageCode);
 
   String get screenTitle {
     final title = screenTitles[languageCode];

@@ -41,12 +41,21 @@ class OfflineTranslations {
     englishName: 'Muhiuddin Khan',
   );
 
+  static const persian = TranslationEdition(
+    identifier: 'fa.makarem',
+    language: 'fa',
+    name: 'مکارم شیرازی',
+    englishName: 'Naser Makarem Shirazi',
+    direction: 'rtl',
+  );
+
   static const editions = <TranslationEdition>[
     english,
     urdu,
     hindi,
     indonesian,
     bengali,
+    persian,
   ];
 
   static const _aliases = <String, String>{
@@ -56,6 +65,7 @@ class OfflineTranslations {
     'hi.hindi': 'hi.hindi',
     'id.indonesian': 'id.indonesian',
     'bn.bengali': 'bn.bengali',
+    'fa.makarem': 'fa.makarem',
   };
 
   static const _assets = <String, String>{
@@ -64,6 +74,7 @@ class OfflineTranslations {
     'hi.hindi': AppAssets.quranHindiJson,
     'id.indonesian': AppAssets.quranIndonesianJson,
     'bn.bengali': AppAssets.quranBengaliJson,
+    'fa.makarem': AppAssets.quranPersianJson,
   };
 
   static String canonicalId(String identifier) {

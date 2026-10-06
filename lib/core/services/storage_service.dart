@@ -78,7 +78,7 @@ class StorageService extends GetxService {
     selectedTranslationName.value = _box.read(translationNameKey) as String? ??
         edition.authorName;
     selectedTranslationLanguage.value =
-        _box.read(translationLanguageKey) as String? ?? edition.languageLabel;
+        _box.read(translationLanguageKey) as String? ?? edition.optionLabel;
     selectedTranslationDirection.value =
         _box.read(translationDirectionKey) as String? ?? edition.direction;
     hasCompletedOnboarding.value =
@@ -283,7 +283,7 @@ class StorageService extends GetxService {
         ? canonical.authorName
         : name;
     selectedTranslationLanguage.value = language.trim().isEmpty
-        ? canonical.languageLabel
+        ? canonical.optionLabel
         : language;
     selectedTranslationDirection.value = direction.trim().isEmpty
         ? canonical.direction

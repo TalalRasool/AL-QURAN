@@ -24,6 +24,10 @@ class TranslationEdition {
 
   String get languageLabel => languageNames[language] ?? language.toUpperCase();
 
+  /// Label shown in the startup picker and Settings.
+  String get optionLabel =>
+      language == 'fa' ? 'Persian (فارسی)' : languageLabel;
+
   bool get isRtl => direction.toLowerCase() == 'rtl';
 
   factory TranslationEdition.fromJson(Map<String, dynamic> json) {

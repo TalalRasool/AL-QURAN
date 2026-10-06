@@ -148,6 +148,7 @@ class QuranReadingController extends GetxController {
         final db = await DatabaseHelper.instance.database;
         return db.query(
           'ayahs',
+          columns: OfflineLanguage.ayahSelectColumns,
           where: 'surah_number = ?',
           whereArgs: [surahNumber],
           orderBy: 'ayah_number ASC',
@@ -182,7 +183,7 @@ class QuranReadingController extends GetxController {
         final db = await DatabaseHelper.instance.database;
         return db.rawQuery(
           '''
-          SELECT * FROM ayahs
+          SELECT ${OfflineLanguage.ayahSelectSql} FROM ayahs
           WHERE (surah_number * 1000 + ayah_number)
             BETWEEN ? AND ?
           ORDER BY surah_number ASC, ayah_number ASC

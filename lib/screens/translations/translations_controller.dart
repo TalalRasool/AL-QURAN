@@ -48,6 +48,7 @@ class TranslationsController extends GetxController {
           (edition) =>
               edition.authorName.toLowerCase().contains(query) ||
               edition.languageLabel.toLowerCase().contains(query) ||
+              edition.optionLabel.toLowerCase().contains(query) ||
               edition.identifier.toLowerCase().contains(query) ||
               edition.name.toLowerCase().contains(query),
         )

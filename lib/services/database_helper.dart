@@ -17,7 +17,8 @@ class DatabaseHelper {
 
   /// Bump this whenever `quran_5_languages_wbw_full.db` in assets must replace
   /// the copy already stored on the device.
-  static const schemaVersion = 1;
+  /// 2: Persian full-ayah (`persian_full`) and word (`persian`) columns.
+  static const schemaVersion = 2;
 
   Database? _db;
   Future<Database>? _opening;

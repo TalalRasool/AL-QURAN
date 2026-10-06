@@ -108,7 +108,7 @@ class OnboardingController extends GetxController {
       await _storage.saveTranslation(
         identifier: language.identifier,
         name: language.authorName,
-        language: language.languageLabel,
+        language: language.optionLabel,
         direction: language.direction,
       );
       await _storage.completeOnboarding();

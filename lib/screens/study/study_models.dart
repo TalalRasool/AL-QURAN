@@ -1,5 +1,5 @@
-/// Maps the app language code (`en`, `ur`, `hi`, `bn`, `id`) onto the SQLite
-/// columns in `ayahs` and `ayah_words`.
+/// Maps the app language code (`en`, `ur`, `hi`, `bn`, `id`, `fa`) onto the
+/// SQLite columns in `ayahs` (`*_full`) and `ayah_words`.
 class OfflineLanguage {
   OfflineLanguage._();
 
@@ -9,6 +9,7 @@ class OfflineLanguage {
     'hi': 'hindi',
     'bn': 'bengali',
     'id': 'indonesian',
+    'fa': 'persian',
   };
 
   static const fullColumns = <String, String>{
@@ -17,7 +18,15 @@ class OfflineLanguage {
     'hi': 'hindi_full',
     'bn': 'bengali_full',
     'id': 'indonesian_full',
+    'fa': 'persian_full',
   };
+
+  static const ayahKeyColumns = <String>[
+    'id',
+    'surah_number',
+    'ayah_number',
+    'arabic',
+  ];
 
   static const _ayahLabels = <String, String>{
     'en': 'Ayah',
@@ -25,7 +34,10 @@ class OfflineLanguage {
     'hi': 'आयत',
     'bn': 'আয়াত',
     'id': 'Ayat',
+    'fa': 'آیه',
   };
+
+  static const _rtlCodes = {'ur', 'fa', 'ar'};
 
   static String normalize(String? code) {
     final value = (code ?? '').trim().toLowerCase();
@@ -38,7 +50,24 @@ class OfflineLanguage {
   static String fullColumn(String languageCode) =>
       fullColumns[normalize(languageCode)]!;
 
-  static bool isRtl(String languageCode) => normalize(languageCode) == 'ur';
+  /// Columns read from `ayahs`, including every bundled translation.
+  static List<String> get ayahSelectColumns => [
+        ...ayahKeyColumns,
+        ...fullColumns.values,
+      ];
+
+  static String get ayahSelectSql => ayahSelectColumns.join(', ');
+
+  /// Columns read from `ayah_words`, including every bundled gloss.
+  static List<String> get wordSelectColumns => [
+        'ayah_id',
+        'word_position',
+        'arabic',
+        ...wordColumns.values,
+      ];
+
+  static bool isRtl(String languageCode) =>
+      _rtlCodes.contains(languageCode.trim().toLowerCase());
 
   static String ayahLabel(String languageCode) =>
       _ayahLabels[normalize(languageCode)] ?? 'Ayah';

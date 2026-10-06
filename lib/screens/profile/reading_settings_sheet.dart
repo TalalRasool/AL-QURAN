@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/controllers/settings_controller.dart';
 import '../../core/data/offline_translations.dart';
 import '../../core/services/storage_service.dart';
+import '../study/study_models.dart';
 
 class ReadingSettingsSheet extends GetView<SettingsController> {
   const ReadingSettingsSheet({super.key});
@@ -116,7 +118,7 @@ class ReadingSettingsSheet extends GetView<SettingsController> {
                 ],
                 labels: {
                   for (final edition in controller.translationEditions)
-                    edition.identifier: edition.languageLabel,
+                    edition.identifier: edition.optionLabel,
                 },
                 selected: OfflineTranslations.canonicalId(
                   Get.find<StorageService>().selectedTranslationId.value,
@@ -152,6 +154,23 @@ class ReadingSettingsSheet extends GetView<SettingsController> {
   }
 }
 
+String _previewTranslation(String languageCode) {
+  switch (OfflineLanguage.normalize(languageCode)) {
+    case 'fa':
+      return 'به نام خداوند بخشنده بخشایشگر';
+    case 'ur':
+      return 'شروع اللہ کا نام لے کر جو بڑا مہربان نہایت رحم والا ہے';
+    case 'hi':
+      return 'अल्लाह के नाम से जो बड़ा मेहरबान निहायत रहम वाला है';
+    case 'bn':
+      return 'পরম করুণাময় অতি দয়ালু আল্লাহর নামে';
+    case 'id':
+      return 'Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.';
+    default:
+      return 'In the name of God, The Most Gracious, The Dispenser of Grace.';
+  }
+}
+
 class _PreviewCard extends StatelessWidget {
   const _PreviewCard({required this.settings});
 
@@ -179,8 +198,11 @@ class _PreviewCard extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            'In the name of God, The Most Gracious, The Dispenser of Grace.',
+            _previewTranslation(settings.translationLanguageCode),
             textAlign: TextAlign.center,
+            textDirection: OfflineLanguage.isRtl(settings.translationLanguageCode)
+                ? TextDirection.rtl
+                : TextDirection.ltr,
             style: settings.translationStyle(color: AppColors.textSecondary),
           ),
         ],
@@ -311,6 +333,9 @@ class _ChoiceRow extends StatelessWidget {
           style: AppTextStyles.bodySmall.copyWith(
             color: isSelected ? AppColors.white : unselectedText,
             fontWeight: FontWeight.w600,
+            fontFamilyFallback: [
+              GoogleFonts.notoNaskhArabic().fontFamily ?? 'Noto Naskh Arabic',
+            ],
           ),
         ),
       ),

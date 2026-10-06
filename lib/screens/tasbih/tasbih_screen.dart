@@ -10,6 +10,7 @@ import '../../core/controllers/settings_controller.dart';
 import '../../core/data/models/azkar_dua.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/widgets/widgets.dart';
+import '../study/study_models.dart';
 import 'tasbih_controller.dart';
 
 class TasbihScreen extends GetView<TasbihController> {
@@ -230,7 +231,7 @@ class _DuaCard extends GetView<TasbihController> {
       final highlighted = controller.highlightDuaId.value == dua.id;
       final title = dua.titleFor(lang);
       final translation = dua.translationFor(lang);
-      final isRtl = lang == 'ur';
+      final isRtl = OfflineLanguage.isRtl(lang);
       return Container(
         width: double.infinity,
         padding: EdgeInsets.fromLTRB(16.w, 12.h, 8.w, 16.h),

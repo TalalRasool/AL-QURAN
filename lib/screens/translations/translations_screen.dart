@@ -77,7 +77,7 @@ class TranslationsScreen extends GetView<TranslationsController> {
                     final edition = editions[index];
                     final isSelected = edition.identifier == selectedId;
                     return _TranslationTile(
-                      language: edition.languageLabel,
+                      language: edition.optionLabel,
                       author: edition.authorName,
                       isSelected: isSelected,
                       onTap: () => controller.selectTranslation(edition),

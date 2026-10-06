@@ -166,7 +166,7 @@ class SettingsController extends GetxService with WidgetsBindingObserver {
     await Get.find<StorageService>().saveTranslation(
       identifier: canonical.identifier,
       name: canonical.authorName,
-      language: canonical.languageLabel,
+      language: canonical.optionLabel,
       direction: canonical.direction,
     );
     if (Get.isRegistered<QuranRepository>()) {
@@ -199,6 +199,14 @@ class SettingsController extends GetxService with WidgetsBindingObserver {
         fontSize: size,
         color: textColor,
         height: height ?? 1.6,
+        fontWeight: FontWeight.w400,
+      );
+    }
+    if (language == 'fa') {
+      return GoogleFonts.notoNaskhArabic(
+        fontSize: size,
+        color: textColor,
+        height: height ?? 1.8,
         fontWeight: FontWeight.w400,
       );
     }

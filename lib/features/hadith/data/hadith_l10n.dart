@@ -6,7 +6,7 @@ import '../../../screens/study/study_models.dart';
 import 'hadith_chapter_names.dart';
 
 /// Localized Hadith book names, chapter names, and short UI labels
-/// for the five offline languages: English, Urdu, Hindi, Bengali, Indonesian.
+/// for the offline languages: English, Urdu, Hindi, Bengali, Indonesian, and Persian.
 class HadithL10n {
   HadithL10n._();
 
@@ -17,6 +17,7 @@ class HadithL10n {
       'hi': 'सहीह अल-बुखारी',
       'bn': 'সহীহ আল-বুখারী',
       'id': 'Shahih al-Bukhari',
+      'fa': 'صحیح البخاری',
     },
     2: {
       'en': 'Sahih Muslim',
@@ -24,6 +25,7 @@ class HadithL10n {
       'hi': 'सहीह मुस्लिम',
       'bn': 'সহীহ মুসলিম',
       'id': 'Shahih Muslim',
+      'fa': 'صحیح مسلم',
     },
     3: {
       'en': 'Sunan Abu Dawud',
@@ -31,6 +33,7 @@ class HadithL10n {
       'hi': 'सुनन अबू दाऊद',
       'bn': 'সুনান আবু দাউদ',
       'id': 'Sunan Abu Dawud',
+      'fa': 'سنن ابوداوود',
     },
     4: {
       'en': 'Jami at-Tirmidhi',
@@ -38,6 +41,7 @@ class HadithL10n {
       'hi': 'जामी अत-तिर्मिज़ी',
       'bn': 'জামে আত-তিরমিযী',
       'id': "Jami' at-Tirmidzi",
+      'fa': 'جامع الترمذی',
     },
     5: {
       'en': "Sunan an-Nasa'i",
@@ -45,6 +49,7 @@ class HadithL10n {
       'hi': 'सुनन अन-नसाई',
       'bn': 'সুনান আন-নাসাঈ',
       'id': "Sunan an-Nasa'i",
+      'fa': 'سنن نسائی',
     },
     6: {
       'en': 'Sunan Ibn Majah',
@@ -52,6 +57,7 @@ class HadithL10n {
       'hi': 'सुनन इब्न माजा',
       'bn': 'সুনান ইবনে মাজাহ',
       'id': 'Sunan Ibnu Majah',
+      'fa': 'سنن ابن ماجه',
     },
   };
 
@@ -62,6 +68,7 @@ class HadithL10n {
       'hi': 'हदीस',
       'bn': 'হাদিস',
       'id': 'Hadis',
+      'fa': 'حدیث',
     },
     'subtitle': {
       'en': 'Read the Sihah Sittah with Arabic and translation.',
@@ -69,6 +76,7 @@ class HadithL10n {
       'hi': 'सिहाह सित्तह को अरबी और अनुवाद के साथ पढ़ें।',
       'bn': 'সিহাহ সিত্তাহ আরবি ও অনুবাদসহ পড়ুন।',
       'id': 'Baca Sihah Sittah dengan Arab dan terjemahan.',
+      'fa': 'صحاح سته را با عربی و ترجمه بخوانید.',
     },
     'edition_line': {
       'en': 'Arabic and translation',
@@ -76,6 +84,7 @@ class HadithL10n {
       'hi': 'अरबी और अनुवाद',
       'bn': 'আরবি ও অনুবাদ',
       'id': 'Arab dan terjemahan',
+      'fa': 'عربی و ترجمه',
     },
     'search_chapters': {
       'en': 'Search chapters',
@@ -83,6 +92,7 @@ class HadithL10n {
       'hi': 'अध्याय खोजें',
       'bn': 'অধ্যায় খুঁজুন',
       'id': 'Cari bab',
+      'fa': 'جستجوی باب‌ها',
     },
     'search_ahadith': {
       'en': 'Search ahadith',
@@ -90,6 +100,7 @@ class HadithL10n {
       'hi': 'हदीस खोजें',
       'bn': 'হাদিস খুঁজুন',
       'id': 'Cari hadis',
+      'fa': 'جستجوی احادیث',
     },
     'introduction': {
       'en': 'Introduction',
@@ -97,6 +108,7 @@ class HadithL10n {
       'hi': 'भूमिका',
       'bn': 'ভূমিকা',
       'id': 'Pendahuluan',
+      'fa': 'مقدمه',
     },
     'no_books': {
       'en': 'No Hadith books found.',
@@ -104,6 +116,7 @@ class HadithL10n {
       'hi': 'हदीस की पुस्तकें नहीं मिलीं।',
       'bn': 'হাদিসের কিতাব পাওয়া যায়নি।',
       'id': 'Kitab hadis tidak ditemukan.',
+      'fa': 'کتاب حدیثی پیدا نشد.',
     },
     'no_chapters': {
       'en': 'No chapters found.',
@@ -111,6 +124,7 @@ class HadithL10n {
       'hi': 'अध्याय नहीं मिले।',
       'bn': 'অধ্যায় পাওয়া যায়নি।',
       'id': 'Bab tidak ditemukan.',
+      'fa': 'بابی پیدا نشد.',
     },
     'no_match_chapters': {
       'en': 'No matching chapters.',
@@ -118,6 +132,7 @@ class HadithL10n {
       'hi': 'कोई अध्याय मेल नहीं खाता।',
       'bn': 'কোনো অধ্যায় মেলেনি।',
       'id': 'Tidak ada bab yang cocok.',
+      'fa': 'باب مطابق پیدا نشد.',
     },
     'no_ahadith': {
       'en': 'No ahadith in this chapter.',
@@ -125,6 +140,7 @@ class HadithL10n {
       'hi': 'इस अध्याय में हदीस नहीं हैं।',
       'bn': 'এই অধ্যায়ে হাদিস নেই।',
       'id': 'Tidak ada hadis di bab ini.',
+      'fa': 'در این باب حدیثی نیست.',
     },
     'no_match_ahadith': {
       'en': 'No matching ahadith.',
@@ -132,6 +148,7 @@ class HadithL10n {
       'hi': 'कोई हदीस मेल नहीं खाती।',
       'bn': 'কোনো হাদিস মেলেনি।',
       'id': 'Tidak ada hadis yang cocok.',
+      'fa': 'حدیث مطابق پیدا نشد.',
     },
     'retry': {
       'en': 'Retry',
@@ -139,6 +156,7 @@ class HadithL10n {
       'hi': 'फिर कोशिश करें',
       'bn': 'আবার চেষ্টা',
       'id': 'Coba lagi',
+      'fa': 'تلاش دوباره',
     },
   };
 
@@ -203,6 +221,7 @@ class HadithL10n {
       'hi' => 'अध्याय $number',
       'bn' => 'অধ্যায় $number',
       'id' => 'Bab $number',
+      'fa' => 'باب $number',
       _ => 'Chapter $number',
     };
   }

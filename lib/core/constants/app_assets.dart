@@ -36,6 +36,7 @@ class AppAssets {
   static const String quranHindiJson = '$_data/hindi.json';
   static const String quranIndonesianJson = '$_data/indonesian.json';
   static const String quranBengaliJson = '$_data/bengali.json';
+  static const String quranPersianJson = '$_data/persian.json';
 
   static const String azkarJson = 'assets/json/azkar.json';
   static const String duasJson = 'assets/json/duas.json';

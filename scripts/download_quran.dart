@@ -57,6 +57,12 @@ const _targets = <_Target>[
     language: 'bn',
     type: 'translation',
   ),
+  _Target(
+    filename: 'persian.json',
+    urls: ['https://api.alquran.cloud/v1/quran/fa.makarem'],
+    language: 'fa',
+    type: 'translation',
+  ),
 ];
 
 Future<void> main() async {
