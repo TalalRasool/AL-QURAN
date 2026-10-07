@@ -50,11 +50,17 @@ class AudioController extends GetxController {
   Future<void> playReciter(Reciter reciter) async {
     await selectReciter(reciter);
     final surahNumber = _storage.lastRead.value?.surahNumber ?? 1;
+    var surahName = 'Surah $surahNumber';
+    try {
+      final surah = await _quran.getSurahByNumber(surahNumber);
+      if (surah.englishName.isNotEmpty) surahName = surah.englishName;
+    } catch (_) {}
     try {
       await _audio.togglePlay(
         surahNumber: surahNumber,
         reciterIdentifier: reciter.identifier,
         reciterName: reciter.displayName,
+        surahName: surahName,
       );
     } catch (_) {
       Get.snackbar('Audio', 'Unable to play this reciter right now.');
