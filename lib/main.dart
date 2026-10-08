@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/controllers/settings_controller.dart';
@@ -17,6 +21,7 @@ import 'services/database_helper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _initBackgroundAudio();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -35,6 +40,16 @@ Future<void> main() async {
   Get.find<AuthService>().attach();
 
   runApp(const AlQuranApp());
+}
+
+Future<void> _initBackgroundAudio() async {
+  if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS)) return;
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.example.alquran.channel.audio',
+    androidNotificationChannelName: 'Quran recitation',
+    androidNotificationChannelDescription: 'Plays surah recitation in the background.',
+    androidNotificationOngoing: true,
+  );
 }
 
 class AlQuranApp extends StatefulWidget {
