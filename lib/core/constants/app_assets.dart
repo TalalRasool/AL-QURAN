@@ -12,6 +12,7 @@ class AppAssets {
   static const String quranOnRehal = '$_images/quran_on_rehal.png';
   static const String mosqueSilhouette = '$_images/mosque_silhouette.png';
   static const String avatarPlaceholder = '$_images/avatar_placeholder.png';
+  static const String appLogo = '$_images/logo.png';
 
   // ── Navigation icons ───────────────────────────────────────────────
 

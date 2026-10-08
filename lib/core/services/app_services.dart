@@ -5,6 +5,7 @@ import '../../features/hadith/data/hadith_db_helper.dart';
 import '../../services/database_helper.dart';
 import '../controllers/bookmark_controller.dart';
 import '../controllers/prayer_notification_controller.dart';
+import '../controllers/quran_audio_controller.dart';
 import '../controllers/settings_controller.dart';
 import '../data/quran_repository.dart';
 import '../data/repositories/api_quran_repository_impl.dart';
@@ -67,6 +68,10 @@ Future<void> initAppServices() async {
       () => AudioService().init(),
       permanent: true,
     );
+  }
+
+  if (!Get.isRegistered<QuranAudioController>()) {
+    Get.put(QuranAudioController(), permanent: true);
   }
 
   if (!Get.isRegistered<AuthService>()) {

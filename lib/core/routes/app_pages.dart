@@ -17,6 +17,7 @@ import '../../screens/onboarding/onboarding_binding.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
 import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/profile_controller.dart';
+import '../../screens/quran/juz_detail_screen.dart';
 import '../../screens/quran/quran_reading_binding.dart';
 import '../../screens/quran/quran_reading_screen.dart';
 import '../../screens/quran/surah_detail_binding.dart';
@@ -96,7 +97,14 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.quranReading,
-      page: () => const QuranReadingScreen(),
+      page: () {
+        final args = Get.arguments;
+        final juz = args is Map ? args['juz'] : null;
+        if (juz is int && juz >= 1 && juz <= 30) {
+          return const JuzDetailScreen();
+        }
+        return const QuranReadingScreen();
+      },
       binding: QuranReadingBinding(),
     ),
     GetPage(
