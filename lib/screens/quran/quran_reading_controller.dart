@@ -137,6 +137,23 @@ class QuranReadingController extends GetxController {
     return 'Surah $number';
   }
 
+  int get playbackSurahNumber {
+    if (isJuzReading) {
+      final index = highlightedIndex.value;
+      if (index >= 0 && index < ayahs.length) {
+        final number = ayahs[index].surahNumber;
+        if (number > 0) return number;
+      }
+    }
+    return selectedSurah.value;
+  }
+
+  String get playbackSurahName {
+    final number = playbackSurahNumber;
+    if (number < 1) return 'Surah';
+    return surahName(number);
+  }
+
   Future<void> loadSurah(
     int surahNumber, {
     bool useRouteAyah = false,

@@ -10,7 +10,6 @@ import '../../core/data/models/ayah.dart';
 import '../../core/data/models/surah.dart';
 import '../../core/data/json_utils.dart';
 import '../../core/data/quran_repository.dart';
-import '../../core/services/audio_service.dart';
 import '../../core/services/storage_service.dart';
 import 'reading_position.dart';
 
@@ -29,7 +28,6 @@ class SurahDetailController extends GetxController with HifzModeMixin {
 
   final QuranRepository _quran = Get.find<QuranRepository>();
   final StorageService _storage = Get.find<StorageService>();
-  final AudioService _audio = Get.find<AudioService>();
   Worker? _translationWorker;
   Timer? _saveTimer;
   int _armedIndex = -1;
@@ -220,22 +218,29 @@ class SurahDetailController extends GetxController with HifzModeMixin {
   bool get isRtlTranslation =>
       _storage.selectedTranslationDirection.value.toLowerCase() == 'rtl';
 
-  String get reciterName {
-    if (_audio.currentReciterName.value.isNotEmpty) {
-      return _audio.currentReciterName.value;
+  int get playbackSurahNumber {
+    if (isJuzMode) {
+      final highlighted = highlightedSurah.value;
+      if (highlighted > 0) return highlighted;
     }
-    return _storage.selectedReciterName.value;
+    return surah.value?.number ?? 0;
   }
 
-  bool get isAudioLoading => _audio.isLoading.value;
-
-  double get progress => _audio.progress;
-
-  bool get isPlayingThisSurah {
-    final number = surah.value?.number;
-    return number != null &&
-        _audio.isPlaying.value &&
-        _audio.currentSurahNumber.value == number;
+  String get playbackSurahName {
+    final number = playbackSurahNumber;
+    for (final ayah in ayahs) {
+      final ayahSurah = ayah.surahNumber > 0 ? ayah.surahNumber : number;
+      if (ayahSurah == number && ayah.surahEnglishName.isNotEmpty) {
+        return ayah.surahEnglishName;
+      }
+    }
+    final current = surah.value;
+    if (current != null &&
+        current.number == number &&
+        current.englishName.isNotEmpty) {
+      return current.englishName;
+    }
+    return number > 0 ? 'Surah $number' : 'Surah';
   }
 
   bool isHighlighted(Ayah ayah) {
@@ -251,34 +256,6 @@ class SurahDetailController extends GetxController with HifzModeMixin {
         ? ayah.surahNumber
         : (surah.value?.number ?? 0);
     return HifzModeMixin.ayahId(surahNumber, ayah.number);
-  }
-
-  Future<void> togglePlay() async {
-    final number = surah.value?.number;
-    if (number == null) return;
-    try {
-      await _audio.togglePlay(
-        surahNumber: number,
-        reciterIdentifier: _storage.selectedReciterId.value,
-        reciterName: _storage.selectedReciterName.value,
-      );
-    } catch (_) {
-      Get.snackbar('Audio', 'Unable to play this surah right now.');
-    }
-  }
-
-  Future<void> seekToProgress(double value) async {
-    final total = _audio.totalDuration.value.inMilliseconds;
-    if (total <= 0) return;
-    await _audio.seek(Duration(milliseconds: (value * total).round()));
-  }
-
-  Future<void> skipBack() => _audio.seek(Duration.zero);
-
-  Future<void> skipForward() async {
-    final next = _audio.currentPosition.value + const Duration(seconds: 10);
-    final total = _audio.totalDuration.value;
-    await _audio.seek(next > total ? total : next);
   }
 
   Future<void> toggleBookmark() async {

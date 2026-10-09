@@ -6,8 +6,11 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/controllers/quran_audio_controller.dart';
 import '../../core/controllers/settings_controller.dart';
 import '../../core/widgets/widgets.dart';
+import '../audio/quran_audio_actions.dart';
+import '../audio/quran_bottom_player.dart';
 import '../study/study_models.dart';
 import 'quran_reading_controller.dart';
 
@@ -25,11 +28,29 @@ class QuranReadingScreen extends GetView<QuranReadingController> {
       controller.languageCode.value;
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: CustomAppBar(title: controller.title),
-        body: _ReadingBody(
-          settings: settings,
-          language: controller.languageCode.value,
-          isRtl: controller.isRtl,
+        appBar: CustomAppBar(
+          title: controller.title,
+          actions: [
+            QuranAudioActions(
+              surahNumber: controller.playbackSurahNumber,
+              surahName: controller.playbackSurahName,
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            _ReadingBody(
+              settings: settings,
+              language: controller.languageCode.value,
+              isRtl: controller.isRtl,
+            ),
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: QuranBottomPlayer(),
+            ),
+          ],
         ),
       );
     });
@@ -91,13 +112,19 @@ class _ReadingBody extends GetView<QuranReadingController> {
         0,
         controller.ayahs.length - 1,
       );
+      final playerVisible = Get.find<QuranAudioController>().showPlayer;
       return Directionality(
         textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         child: ScrollablePositionedList.builder(
           initialScrollIndex: initialIndex,
           itemScrollController: controller.itemScrollController,
           itemPositionsListener: controller.itemPositionsListener,
-          padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 28.h),
+          padding: EdgeInsets.fromLTRB(
+            16.w,
+            8.h,
+            16.w,
+            quranListBottomPadding(context, playerVisible),
+          ),
           itemCount: controller.ayahs.length,
           itemBuilder: (context, index) {
             final ayah = controller.ayahs[index];

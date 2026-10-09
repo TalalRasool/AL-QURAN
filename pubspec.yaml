@@ -55,6 +55,8 @@ dependencies:
   hijri: ^3.0.1
   share_plus: ^13.3.1
   scrollable_positioned_list: ^0.3.8
+  dio: ^5.11.1
+  just_audio_background: ^0.0.1-beta.17
 
 # permission_handler 13+ pulls permission_handler_android 14, which requires Android SDK 37.
 dependency_overrides:

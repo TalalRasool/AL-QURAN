@@ -6,8 +6,11 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/controllers/bookmark_controller.dart';
+import '../../core/controllers/quran_audio_controller.dart';
 import '../../core/controllers/settings_controller.dart';
 import '../../core/widgets/widgets.dart';
+import '../audio/quran_audio_actions.dart';
+import '../audio/quran_bottom_player.dart';
 import 'surah_detail_controller.dart';
 
 class SurahDetailScreen extends GetView<SurahDetailController> {
@@ -36,14 +39,28 @@ class SurahDetailScreen extends GetView<SurahDetailController> {
                 onPressed: controller.toggleBookmark,
               );
             }),
+            QuranAudioActions(
+              surahNumber: controller.playbackSurahNumber,
+              surahName: controller.playbackSurahName,
+            ),
           ],
         ),
-        body: _buildBody(),
+        body: Stack(
+          children: [
+            _buildBody(context),
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: QuranBottomPlayer(),
+            ),
+          ],
+        ),
       );
     });
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
     if (controller.isLoading.value) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.primary),
@@ -84,7 +101,15 @@ class SurahDetailScreen extends GetView<SurahDetailController> {
                 ),
           itemScrollController: controller.itemScrollController,
           itemPositionsListener: controller.itemPositionsListener,
-          padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 120.h),
+          padding: EdgeInsets.fromLTRB(
+            20.w,
+            8.h,
+            20.w,
+            quranListBottomPadding(
+              context,
+              Get.find<QuranAudioController>().showPlayer,
+            ),
+          ),
           itemCount: controller.ayahs.length,
           itemBuilder: (context, index) {
             final ayah = controller.ayahs[index];
@@ -122,12 +147,6 @@ class SurahDetailScreen extends GetView<SurahDetailController> {
               ],
             );
           },
-        ),
-        const Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: _FloatingPlayer(),
         ),
       ],
     );
@@ -288,114 +307,5 @@ class _AyahCard extends GetView<SurahDetailController> {
         ),
       );
     });
-  }
-}
-
-class _FloatingPlayer extends GetView<SurahDetailController> {
-  const _FloatingPlayer();
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(20.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.25),
-                blurRadius: 16.r,
-                offset: Offset(0, 6.h),
-              ),
-            ],
-          ),
-          child: Obx(
-            () => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        controller.reciterName,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: controller.skipBack,
-                      child: Icon(
-                        Icons.skip_previous_rounded,
-                        color: AppColors.white,
-                        size: 28.sp,
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    GestureDetector(
-                      onTap: controller.togglePlay,
-                      child: Container(
-                        width: 40.w,
-                        height: 40.w,
-                        decoration: const BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: controller.isAudioLoading
-                            ? Padding(
-                                padding: EdgeInsets.all(10.w),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.w,
-                                  color: AppColors.primary,
-                                ),
-                              )
-                            : Icon(
-                                controller.isPlayingThisSurah
-                                    ? Icons.pause_rounded
-                                    : Icons.play_arrow_rounded,
-                                color: AppColors.primary,
-                                size: 24.sp,
-                              ),
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    GestureDetector(
-                      onTap: controller.skipForward,
-                      child: Icon(
-                        Icons.skip_next_rounded,
-                        color: AppColors.white,
-                        size: 28.sp,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4.h),
-                SliderTheme(
-                  data: SliderThemeData(
-                    trackHeight: 4.h,
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.r),
-                    overlayShape: RoundSliderOverlayShape(overlayRadius: 12.r),
-                    activeTrackColor: AppColors.white,
-                    inactiveTrackColor: AppColors.white.withValues(alpha: 0.2),
-                    thumbColor: AppColors.white,
-                  ),
-                  child: Slider(
-                    value: controller.progress,
-                    onChanged: controller.seekToProgress,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
