@@ -9,6 +9,7 @@ import '../../core/widgets/widgets.dart';
 import 'data/hadith_l10n.dart';
 import 'data/hadith_models.dart';
 import 'hadith_chapters_controller.dart';
+import 'hadith_script_style.dart';
 
 class HadithChaptersScreen extends GetView<HadithChaptersController> {
   const HadithChaptersScreen({super.key});
@@ -26,6 +27,13 @@ class HadithChaptersScreen extends GetView<HadithChaptersController> {
           appBar: CustomAppBar(
             title: controller.bookName,
             titleMaxLines: 2,
+            titleStyle: hadithLanguageStyle(
+              lang,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              height: 1.3,
+            ),
           ),
           body: Column(
             children: [
@@ -35,6 +43,12 @@ class HadithChaptersScreen extends GetView<HadithChaptersController> {
                   child: CustomTextField(
                     hintText: HadithL10n.ui('search_chapters', lang),
                     onChanged: controller.onSearch,
+                    style: hadithLanguageStyle(
+                      lang,
+                      fontSize: 14.sp,
+                      color: AppColors.textPrimary,
+                      height: 1.5,
+                    ),
                   ),
                 ),
               Expanded(child: _buildBody(lang, isRtl)),
@@ -67,7 +81,15 @@ class HadithChaptersScreen extends GetView<HadithChaptersController> {
               SizedBox(height: 12.h),
               TextButton(
                 onPressed: controller.load,
-                child: Text(HadithL10n.ui('retry', lang)),
+                child: Text(
+                  HadithL10n.ui('retry', lang),
+                  style: hadithLanguageStyle(
+                    lang,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
               ),
             ],
           ),
@@ -81,7 +103,13 @@ class HadithChaptersScreen extends GetView<HadithChaptersController> {
           controller.searchQuery.value.trim().isEmpty
               ? HadithL10n.ui('no_chapters', lang)
               : HadithL10n.ui('no_match_chapters', lang),
-          style: AppTextStyles.body,
+          style: hadithLanguageStyle(
+            lang,
+            fontSize: 14.sp,
+            color: AppColors.textPrimary,
+            height: 1.5,
+          ),
+          textAlign: TextAlign.center,
         ),
       );
     }
@@ -173,14 +201,25 @@ class _HadithChapterTile extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: AppTextStyles.heading3,
+                      style: hadithLanguageStyle(
+                        languageCode,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        height: 1.35,
+                      ),
                       textDirection:
                           isRtl ? TextDirection.rtl : TextDirection.ltr,
                     ),
                     SizedBox(height: 4.h),
                     Text(
                       label,
-                      style: AppTextStyles.bodySmall,
+                      style: hadithLanguageStyle(
+                        languageCode,
+                        fontSize: 12.sp,
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
                       textDirection:
                           isRtl ? TextDirection.rtl : TextDirection.ltr,
                     ),

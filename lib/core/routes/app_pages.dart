@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 
 import '../../features/hadith/hadith_binding.dart';
+import '../../features/worship/worship_binding.dart';
+import '../../features/worship/worship_categories_screen.dart';
+import '../../features/worship/worship_detail_screen.dart';
 import '../../features/hadith/hadith_chapters_screen.dart';
 import '../../features/hadith/hadith_read_screen.dart';
 import '../../screens/bookmarks/bookmarks_screen.dart';
@@ -59,10 +62,7 @@ class AppPages {
       page: () => const TranslationsScreen(),
       binding: TranslationsBinding(),
     ),
-    GetPage(
-      name: AppRoutes.bookmarks,
-      page: () => const BookmarksScreen(),
-    ),
+    GetPage(name: AppRoutes.bookmarks, page: () => const BookmarksScreen()),
     GetPage(
       name: AppRoutes.mushaf,
       page: () => MushafScreen(
@@ -84,6 +84,16 @@ class AppPages {
       name: AppRoutes.islamicHistory,
       page: () => const IslamicHistoryScreen(),
       binding: IslamicHistoryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.worshipCategories,
+      page: () => const WorshipCategoriesScreen(),
+      binding: WorshipBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.worshipDetail,
+      page: () => const WorshipDetailScreen(),
+      binding: WorshipBinding(),
     ),
     GetPage(
       name: AppRoutes.hifzTester,

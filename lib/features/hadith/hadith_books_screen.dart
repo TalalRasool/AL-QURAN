@@ -8,6 +8,7 @@ import '../../core/controllers/settings_controller.dart';
 import 'data/hadith_l10n.dart';
 import 'data/hadith_models.dart';
 import 'hadith_books_controller.dart';
+import 'hadith_script_style.dart';
 
 class HadithBooksScreen extends GetView<HadithBooksController> {
   const HadithBooksScreen({super.key});
@@ -28,11 +29,25 @@ class HadithBooksScreen extends GetView<HadithBooksController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 8.h),
-                Text(HadithL10n.ui('hadith', lang), style: AppTextStyles.heading2),
+                Text(
+                  HadithL10n.ui('hadith', lang),
+                  style: hadithLanguageStyle(
+                    lang,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    height: 1.3,
+                  ),
+                ),
                 SizedBox(height: 6.h),
                 Text(
                   HadithL10n.ui('subtitle', lang),
-                  style: AppTextStyles.bodySmall,
+                  style: hadithLanguageStyle(
+                    lang,
+                    fontSize: 12.sp,
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
                 ),
                 SizedBox(height: 16.h),
                 Expanded(child: _buildBody(lang)),
@@ -66,7 +81,15 @@ class HadithBooksScreen extends GetView<HadithBooksController> {
               SizedBox(height: 12.h),
               TextButton(
                 onPressed: controller.load,
-                child: Text(HadithL10n.ui('retry', lang)),
+                child: Text(
+                  HadithL10n.ui('retry', lang),
+                  style: hadithLanguageStyle(
+                    lang,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
               ),
             ],
           ),
@@ -79,7 +102,13 @@ class HadithBooksScreen extends GetView<HadithBooksController> {
       return Center(
         child: Text(
           HadithL10n.ui('no_books', lang),
-          style: AppTextStyles.body,
+          style: hadithLanguageStyle(
+            lang,
+            fontSize: 14.sp,
+            color: AppColors.textPrimary,
+            height: 1.5,
+          ),
+          textAlign: TextAlign.center,
         ),
       );
     }
@@ -156,7 +185,13 @@ class _HadithBookCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: AppTextStyles.heading3,
+                      style: hadithLanguageStyle(
+                        languageCode,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        height: 1.35,
+                      ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       textDirection:
@@ -165,9 +200,16 @@ class _HadithBookCard extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Text(
                       HadithL10n.ui('edition_line', languageCode),
-                      style: AppTextStyles.bodySmall,
+                      style: hadithLanguageStyle(
+                        languageCode,
+                        fontSize: 12.sp,
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      textDirection:
+                          isRtl ? TextDirection.rtl : TextDirection.ltr,
                     ),
                   ],
                 ),

@@ -55,24 +55,17 @@ class HadithReadController extends GetxController {
   String get activeTranslationKey =>
       '${_storage.selectedTranslationId.value}|${_storage.selectedTranslationLanguage.value}';
 
-  bool get isRtlTranslation {
-    if (_prefersUrdu) return true;
-    return _storage.selectedTranslationDirection.value.toLowerCase() == 'rtl';
-  }
+  String get languageCode => HadithL10n.languageCode();
 
-  bool get _prefersUrdu {
-    final language = _storage.selectedTranslationLanguage.value.toLowerCase();
-    final id = _storage.selectedTranslationId.value.toLowerCase();
-    return language.contains('urdu') || id.startsWith('ur');
-  }
+  /// Selected translation, or English when that book has no text for this hadith.
+  String translationOf(Hadith hadith) => hadith.textFor(languageCode);
 
-  String translationOf(Hadith hadith) {
-    if (_prefersUrdu && hadith.textUr.trim().isNotEmpty) {
-      return hadith.textUr;
-    }
-    if (hadith.textEn.trim().isNotEmpty) return hadith.textEn;
-    return hadith.textUr;
-  }
+  /// Language of [translationOf]. English when the selected edition is missing.
+  String translationLanguageOf(Hadith hadith) =>
+      hadith.resolvedLanguage(languageCode);
+
+  bool translationIsRtl(Hadith hadith) =>
+      HadithL10n.isRtl(translationLanguageOf(hadith));
 
   RxList<AppBookmark> get bookmarks => Get.find<BookmarkController>().items;
 

@@ -44,6 +44,8 @@ class AppAssets {
   static const String seerahJson = 'assets/json/seerah.json';
   static const String sahabaJson = 'assets/json/sahaba.json';
   static const String ghazawatJson = 'assets/json/ghazawat.json';
+  static const String worshipGuideJson =
+      'assets/worship_guide/alquran_islamic_worship_guide_6_languages.json';
 
   static const String quranWbwDb =
       'assets/databases/quran_5_languages_wbw_full.db';

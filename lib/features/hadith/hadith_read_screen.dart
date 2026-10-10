@@ -10,6 +10,7 @@ import '../../core/widgets/widgets.dart';
 import 'data/hadith_l10n.dart';
 import 'data/hadith_models.dart';
 import 'hadith_read_controller.dart';
+import 'hadith_script_style.dart';
 
 class HadithReadScreen extends GetView<HadithReadController> {
   const HadithReadScreen({super.key});
@@ -23,6 +24,13 @@ class HadithReadScreen extends GetView<HadithReadController> {
       controller.activeTranslationKey;
       final lang = HadithL10n.watchLanguage();
       final isRtl = HadithL10n.isRtl(lang);
+      final titleStyle = hadithLanguageStyle(
+        lang,
+        fontSize: 20.sp,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        height: 1.3,
+      );
       return Directionality(
         textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         child: Scaffold(
@@ -30,6 +38,7 @@ class HadithReadScreen extends GetView<HadithReadController> {
           appBar: CustomAppBar(
             title: controller.bookName,
             titleMaxLines: 2,
+            titleStyle: titleStyle,
           ),
           body: Column(
             children: [
@@ -41,7 +50,13 @@ class HadithReadScreen extends GetView<HadithReadController> {
                         isRtl ? Alignment.centerRight : Alignment.centerLeft,
                     child: Text(
                       controller.chapterName,
-                      style: AppTextStyles.heading3,
+                      style: hadithLanguageStyle(
+                        lang,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        height: 1.35,
+                      ),
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
                       textDirection:
                           isRtl ? TextDirection.rtl : TextDirection.ltr,
@@ -53,6 +68,12 @@ class HadithReadScreen extends GetView<HadithReadController> {
                   child: CustomTextField(
                     hintText: HadithL10n.ui('search_ahadith', lang),
                     onChanged: controller.onSearch,
+                    style: hadithLanguageStyle(
+                      lang,
+                      fontSize: 14.sp,
+                      color: AppColors.textPrimary,
+                      height: 1.5,
+                    ),
                   ),
                 ),
               ],
@@ -86,7 +107,15 @@ class HadithReadScreen extends GetView<HadithReadController> {
               SizedBox(height: 12.h),
               TextButton(
                 onPressed: controller.load,
-                child: Text(HadithL10n.ui('retry', lang)),
+                child: Text(
+                  HadithL10n.ui('retry', lang),
+                  style: hadithLanguageStyle(
+                    lang,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
               ),
             ],
           ),
@@ -100,7 +129,13 @@ class HadithReadScreen extends GetView<HadithReadController> {
           controller.searchQuery.value.trim().isEmpty
               ? HadithL10n.ui('no_ahadith', lang)
               : HadithL10n.ui('no_match_ahadith', lang),
-          style: AppTextStyles.body,
+          style: hadithLanguageStyle(
+            lang,
+            fontSize: 14.sp,
+            color: AppColors.textPrimary,
+            height: 1.5,
+          ),
+          textAlign: TextAlign.center,
         ),
       );
     }
@@ -137,7 +172,8 @@ class _HadithCard extends GetView<HadithReadController> {
   Widget build(BuildContext context) {
     final settings = Get.find<SettingsController>();
     final translation = controller.translationOf(hadith);
-    final isRtl = controller.isRtlTranslation;
+    final translationLanguage = controller.translationLanguageOf(hadith);
+    final isRtl = controller.translationIsRtl(hadith);
     final arabicColor =
         AppColors.isDark ? const Color(0xFF81C784) : const Color(0xFF1B5E20);
     final translationColor =
@@ -165,9 +201,12 @@ class _HadithCard extends GetView<HadithReadController> {
                     hadith.numberLabel,
                     languageCode: languageCode,
                   ),
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.white,
+                  style: hadithLanguageStyle(
+                    languageCode,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w700,
+                    color: AppColors.white,
+                    height: 1.3,
                   ),
                 ),
               ),
@@ -184,7 +223,7 @@ class _HadithCard extends GetView<HadithReadController> {
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(right: 8.w),
+            padding: EdgeInsetsDirectional.only(end: 8.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -204,7 +243,10 @@ class _HadithCard extends GetView<HadithReadController> {
                     textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     textDirection:
                         isRtl ? TextDirection.rtl : TextDirection.ltr,
-                    style: settings.translationStyle(color: translationColor),
+                    style: settings.translationStyle(
+                      color: translationColor,
+                      languageCode: translationLanguage,
+                    ),
                   ),
                 ],
               ],

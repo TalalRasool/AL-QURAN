@@ -18,6 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onMenuTap,
     this.centerTitle = true,
     this.titleMaxLines = 1,
+    this.titleStyle,
   });
 
   final String title;
@@ -28,6 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onMenuTap;
   final bool centerTitle;
   final int titleMaxLines;
+  final TextStyle? titleStyle;
 
   double get _toolbarHeight {
     final lines = titleMaxLines < 1 ? 1 : titleMaxLines;
@@ -58,7 +60,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: _buildLeading(),
       title: Text(
         title,
-        style: AppTextStyles.heading2,
+        style: titleStyle ?? AppTextStyles.heading2,
         maxLines: titleMaxLines < 1 ? 1 : titleMaxLines,
         overflow: TextOverflow.ellipsis,
         textAlign: centerTitle ? TextAlign.center : TextAlign.start,

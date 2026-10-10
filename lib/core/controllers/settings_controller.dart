@@ -174,10 +174,14 @@ class SettingsController extends GetxService with WidgetsBindingObserver {
     }
   }
 
-  TextStyle translationStyle({Color? color, double? height}) {
+  TextStyle translationStyle({
+    Color? color,
+    double? height,
+    String? languageCode,
+  }) {
     final size = translationTextSize.value;
     final textColor = color ?? AppColors.textPrimary;
-    final language = translationLanguageCode;
+    final language = languageCode ?? translationLanguageCode;
     if (language == 'ur') {
       return GoogleFonts.notoNastaliqUrdu(
         fontSize: size,

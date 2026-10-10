@@ -22,6 +22,7 @@ class CustomTextField extends StatelessWidget {
     this.autofillHints,
     this.fillColor,
     this.radius,
+    this.style,
   });
 
   final TextEditingController? controller;
@@ -38,9 +39,11 @@ class CustomTextField extends StatelessWidget {
   final Iterable<String>? autofillHints;
   final Color? fillColor;
   final double? radius;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = style ?? AppTextStyles.body;
     return TextField(
       controller: controller,
       onChanged: onChanged,
@@ -50,13 +53,13 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       textCapitalization: textCapitalization,
       autofillHints: autofillHints,
-      style: AppTextStyles.body,
+      style: textStyle,
       cursorColor: AppColors.primary,
       decoration: InputDecoration(
         filled: true,
         fillColor: fillColor ?? AppColors.searchFill,
         hintText: hintText,
-        hintStyle: AppTextStyles.body.copyWith(color: AppColors.textHint),
+        hintStyle: textStyle.copyWith(color: AppColors.textHint),
         prefixIcon: showPrefixIcon
             ? prefixIcon ??
                 Icon(

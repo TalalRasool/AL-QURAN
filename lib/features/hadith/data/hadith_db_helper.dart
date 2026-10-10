@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'hadith_editions.dart';
 import 'hadith_models.dart';
 
 class HadithDbHelper {
@@ -15,7 +16,7 @@ class HadithDbHelper {
   static const fileName = 'hadith.db';
 
   /// Bump this whenever `hadith.db` in assets must replace the device copy.
-  static const schemaVersion = 3;
+  static const schemaVersion = 4;
   static const pageSize = 40;
 
   Database? _db;
@@ -98,15 +99,20 @@ class HadithDbHelper {
         args.add(number);
       } else {
         final like = '%${_escapeLike(trimmed)}%';
+        final textColumns = [
+          HadithEditions.textArColumn,
+          for (final spec in HadithEditions.translations) spec.column!,
+        ];
         where.write(
           " AND ("
-          "CAST(hadith_number AS TEXT) LIKE ? ESCAPE '\\' "
-          "OR text_ar LIKE ? ESCAPE '\\' "
-          "OR text_en LIKE ? ESCAPE '\\' "
-          "OR text_ur LIKE ? ESCAPE '\\'"
-          ')',
+          "CAST(hadith_number AS TEXT) LIKE ? ESCAPE '\\'",
         );
-        args.addAll([like, like, like, like]);
+        args.add(like);
+        for (final column in textColumns) {
+          where.write(" OR $column LIKE ? ESCAPE '\\'");
+          args.add(like);
+        }
+        where.write(')');
       }
     }
 
