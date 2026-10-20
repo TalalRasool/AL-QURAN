@@ -18,4 +18,5 @@ abstract class AppRoutes {
   static const String quranStudy = '/quran-study';
   static const String quranReading = '/quran-reading';
   static const String editProfile = '/edit-profile';
+  static const String downloadedAudio = '/downloaded-audio';
 }

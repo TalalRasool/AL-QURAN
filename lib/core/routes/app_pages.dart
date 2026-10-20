@@ -6,6 +6,7 @@ import '../../features/worship/worship_categories_screen.dart';
 import '../../features/worship/worship_detail_screen.dart';
 import '../../features/hadith/hadith_chapters_screen.dart';
 import '../../features/hadith/hadith_read_screen.dart';
+import '../../screens/audio/downloaded_audio_screen.dart';
 import '../../screens/bookmarks/bookmarks_screen.dart';
 import '../../screens/hifz_tester_binding.dart';
 import '../../screens/hifz_tester_screen.dart';
@@ -116,6 +117,11 @@ class AppPages {
         return const QuranReadingScreen();
       },
       binding: QuranReadingBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.downloadedAudio,
+      page: () => const DownloadedAudioScreen(),
+      binding: DownloadedAudioBinding(),
     ),
     GetPage(
       name: AppRoutes.editProfile,
