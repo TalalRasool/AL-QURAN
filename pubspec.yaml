@@ -95,6 +95,7 @@ flutter:
     - assets/json/seerah.json
     - assets/json/sahaba.json
     - assets/json/ghazawat.json
+    - assets/worship_guide/
 
 flutter_launcher_icons:
   android: "launcher_icon"

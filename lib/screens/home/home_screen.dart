@@ -8,6 +8,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/controllers/settings_controller.dart';
 import '../../core/widgets/widgets.dart';
+import '../../features/worship/worship_l10n.dart';
 import 'home_controller.dart';
 
 class HomeScreen extends GetView<HomeController> {
@@ -24,10 +25,7 @@ class HomeScreen extends GetView<HomeController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _HomeEntrance(
-                delay: Duration.zero,
-                child: _HomeHeader(),
-              ),
+              _HomeEntrance(delay: Duration.zero, child: _HomeHeader()),
               SizedBox(height: 16.h),
               _HomeEntrance(
                 delay: const Duration(milliseconds: 50),
@@ -43,9 +41,14 @@ class HomeScreen extends GetView<HomeController> {
                 delay: const Duration(milliseconds: 180),
                 child: _ShortcutsSection(),
               ),
+              SizedBox(height: 16.h),
+              _HomeEntrance(
+                delay: const Duration(milliseconds: 230),
+                child: const _WorshipGuideCard(),
+              ),
               SizedBox(height: 24.h),
               _HomeEntrance(
-                delay: const Duration(milliseconds: 270),
+                delay: const Duration(milliseconds: 310),
                 child: _DailyVerseCard(),
               ),
             ],
@@ -57,10 +60,7 @@ class HomeScreen extends GetView<HomeController> {
 }
 
 class _HomeEntrance extends StatefulWidget {
-  const _HomeEntrance({
-    required this.child,
-    required this.delay,
-  });
+  const _HomeEntrance({required this.child, required this.delay});
 
   final Widget child;
   final Duration delay;
@@ -106,10 +106,7 @@ class _HomeEntranceState extends State<_HomeEntrance>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _fade,
-      child: SlideTransition(
-        position: _slide,
-        child: widget.child,
-      ),
+      child: SlideTransition(position: _slide, child: widget.child),
     );
   }
 }
@@ -125,10 +122,7 @@ class _HomeHeader extends GetView<HomeController> {
           width: 48.w,
           height: 48.w,
           child: ClipOval(
-            child: Image.asset(
-              AppAssets.avatarPlaceholder,
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset(AppAssets.avatarPlaceholder, fit: BoxFit.cover),
           ),
         ),
         SizedBox(width: 12.w),
@@ -253,10 +247,7 @@ class _HeaderIconButton extends StatelessWidget {
           asset,
           width: 20.w,
           height: 20.w,
-          colorFilter: ColorFilter.mode(
-            AppColors.textPrimary,
-            BlendMode.srcIn,
-          ),
+          colorFilter: ColorFilter.mode(AppColors.textPrimary, BlendMode.srcIn),
         ),
       ),
     );
@@ -509,6 +500,108 @@ class _ShortcutTile extends StatelessWidget {
   }
 }
 
+class _WorshipGuideCard extends GetView<HomeController> {
+  const _WorshipGuideCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final settings = Get.find<SettingsController>();
+      settings.isDarkMode.value;
+      final lang = WorshipL10n.code(settings.translationLanguageCode);
+      final title = WorshipL10n.text(WorshipL10n.homeTitle, lang);
+      final subtitleIsUrdu = lang == 'en';
+      final subtitle = subtitleIsUrdu
+          ? WorshipL10n.homeTitle['ur']!
+          : WorshipL10n.homeTitle['en']!;
+      final subtitleLang = subtitleIsUrdu ? 'ur' : 'en';
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: controller.openWorshipGuide,
+          borderRadius: BorderRadius.circular(20.r),
+          child: Ink(
+            width: double.infinity,
+            padding: EdgeInsets.fromLTRB(16.w, 16.h, 14.w, 16.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.r),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primary, Color(0xFF2D6A4F)],
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.w,
+                  height: 48.w,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: Icon(
+                    Icons.mosque_rounded,
+                    color: AppColors.white,
+                    size: 26.sp,
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        textDirection: WorshipL10n.direction(lang),
+                        style: settings
+                            .translationStyle(
+                              languageCode: lang,
+                              color: AppColors.white,
+                              height: lang == 'ur' ? 1.8 : 1.3,
+                            )
+                            .copyWith(
+                              fontSize: lang == 'ur' ? 18.sp : 16.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        subtitle,
+                        textDirection: WorshipL10n.direction(subtitleLang),
+                        style: settings
+                            .translationStyle(
+                              languageCode: subtitleLang,
+                              color: AppColors.white.withValues(alpha: 0.82),
+                              height: subtitleLang == 'ur' ? 1.8 : 1.3,
+                            )
+                            .copyWith(
+                              fontSize: subtitleLang == 'ur' ? 14.sp : 12.sp,
+                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.white.withValues(alpha: 0.9),
+                  size: 16.sp,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+}
+
 class _DailyVerseCard extends GetView<HomeController> {
   const _DailyVerseCard();
 
@@ -586,9 +679,11 @@ class _DailyVerseCard extends GetView<HomeController> {
               final settings = Get.find<SettingsController>();
               return Text(
                 verse.arabic,
-                style: settings.arabicStyle(height: 2.2).copyWith(
-                  leadingDistribution: TextLeadingDistribution.even,
-                ),
+                style: settings
+                    .arabicStyle(height: 2.2)
+                    .copyWith(
+                      leadingDistribution: TextLeadingDistribution.even,
+                    ),
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
               );

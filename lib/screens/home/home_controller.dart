@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:share_plus/share_plus.dart';
-
 import '../../core/data/models/daily_verse.dart';
 import '../../core/data/models/surah.dart';
 import '../../core/data/quran_repository.dart';
@@ -9,7 +8,6 @@ import '../../core/routes/app_routes.dart';
 import '../../core/services/storage_service.dart';
 import '../main/navigation_controller.dart';
 import '../quran/quran_controller.dart';
-
 class HomeController extends GetxController {
   final QuranRepository _quran = Get.find<QuranRepository>();
   final StorageService _storage = Get.find<StorageService>();
@@ -17,14 +15,11 @@ class HomeController extends GetxController {
   final dailyVerse = Rxn<DailyVerse>();
   final isDailyVerseLoading = false.obs;
   final _workers = <Worker>[];
-
   NavigationController get _nav => Get.find<NavigationController>();
-
   String get userName {
     final name = _storage.userName.value.trim();
     return name.isEmpty ? 'Reader' : name;
   }
-
   String get gregorianDateLabel {
     const weekdays = [
       'Monday',
@@ -106,7 +101,8 @@ class HomeController extends GetxController {
 
   String get continueSurahTitle {
     if (isMushafLastRead) {
-      final page = _storage.lastRead.value?.mushafPage ?? _storage.lastMushafPage;
+      final page =
+          _storage.lastRead.value?.mushafPage ?? _storage.lastMushafPage;
       return 'Mushaf - Page $page';
     }
     final name = lastReadSurah.value?.englishName;
@@ -129,20 +125,14 @@ class HomeController extends GetxController {
     if (last != null && last.isMushaf) {
       Get.toNamed(
         AppRoutes.mushaf,
-        arguments: {
-          'initialPage': last.mushafPage ?? _storage.lastMushafPage,
-        },
+        arguments: {'initialPage': last.mushafPage ?? _storage.lastMushafPage},
       );
       return;
     }
-    final number =
-        lastReadSurah.value?.number ?? last?.surahNumber ?? 1;
+    final number = lastReadSurah.value?.number ?? last?.surahNumber ?? 1;
     Get.toNamed(
       AppRoutes.quranReading,
-      arguments: {
-        'surah': number,
-        'ayah': last?.ayahNumber ?? 1,
-      },
+      arguments: {'surah': number, 'ayah': last?.ayahNumber ?? 1},
     );
   }
 
@@ -159,13 +149,15 @@ class HomeController extends GetxController {
   void openBookmarks() => Get.toNamed(AppRoutes.bookmarks);
 
   void openMushaf() => Get.toNamed(
-        AppRoutes.mushaf,
-        arguments: {'initialPage': _storage.lastMushafPage},
-      );
+    AppRoutes.mushaf,
+    arguments: {'initialPage': _storage.lastMushafPage},
+  );
 
   void openTasbih() => Get.toNamed(AppRoutes.tasbih);
 
   void openIslamicHistory() => Get.toNamed(AppRoutes.islamicHistory);
+
+  void openWorshipGuide() => Get.toNamed(AppRoutes.worshipCategories);
 
   void openHifzTester() => Get.toNamed(AppRoutes.hifzTester);
 
@@ -194,11 +186,7 @@ class HomeController extends GetxController {
     try {
       await SharePlus.instance.share(ShareParams(text: text));
     } catch (_) {
-      Get.snackbar(
-        'Daily Verse',
-        text,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Daily Verse', text, snackPosition: SnackPosition.BOTTOM);
     }
   }
 }

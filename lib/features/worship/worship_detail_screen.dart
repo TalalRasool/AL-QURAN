@@ -141,7 +141,12 @@ class _GuideArticle extends GetView<WorshipController> {
     final title = guide.titleFor(languageCode);
     final summary = guide.summaryFor(languageCode);
     final steps = guide.stepsFor(languageCode);
+    final preparation = guide.preparationFor(languageCode);
+    final detailedSteps = guide.detailedStepsFor(languageCode);
+    final situations = guide.situationsFor(languageCode);
     final problems = guide.problemsFor(languageCode);
+    final mistakes = guide.mistakesToAvoidFor(languageCode);
+    final scopeNote = guide.scopeNoteFor(languageCode);
 
     return Container(
       width: double.infinity,
@@ -186,14 +191,50 @@ class _GuideArticle extends GetView<WorshipController> {
               ),
             ],
           ],
-          if (problems.isNotEmpty) ...[
+          if (preparation.isNotEmpty)
+            _BulletSection(
+              label: WorshipL10n.text(WorshipL10n.preparation, languageCode),
+              lines: preparation,
+              direction: direction,
+            ),
+          if (detailedSteps.isNotEmpty)
+            _NumberedSection(
+              label: WorshipL10n.text(WorshipL10n.detailedSteps, languageCode),
+              lines: detailedSteps,
+              direction: direction,
+            ),
+          if (situations.isNotEmpty)
+            _BulletSection(
+              label: WorshipL10n.text(WorshipL10n.situations, languageCode),
+              lines: situations,
+              direction: direction,
+            ),
+          if (problems.isNotEmpty)
+            _BulletSection(
+              label: WorshipL10n.text(WorshipL10n.problems, languageCode),
+              lines: problems,
+              direction: direction,
+            ),
+          if (mistakes.isNotEmpty)
+            _BulletSection(
+              label: WorshipL10n.text(
+                WorshipL10n.mistakesToAvoid,
+                languageCode,
+              ),
+              lines: mistakes,
+              direction: direction,
+            ),
+          if (scopeNote.isNotEmpty) ...[
             SizedBox(height: 16.h),
-            _SectionLabel(WorshipL10n.text(WorshipL10n.problems, languageCode)),
-            SizedBox(height: 8.h),
-            for (var i = 0; i < problems.length; i++) ...[
-              if (i > 0) SizedBox(height: 8.h),
-              _NoteLine(text: problems[i], direction: direction),
-            ],
+            _SectionLabel(
+              WorshipL10n.text(WorshipL10n.scopeNote, languageCode),
+            ),
+            SizedBox(height: 6.h),
+            Text(
+              scopeNote,
+              textDirection: direction,
+              style: controller.readingStyle(color: AppColors.textSecondary),
+            ),
           ],
           if (guide.references.isNotEmpty) ...[
             SizedBox(height: 16.h),
@@ -216,6 +257,66 @@ class _GuideArticle extends GetView<WorshipController> {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _NumberedSection extends StatelessWidget {
+  const _NumberedSection({
+    required this.label,
+    required this.lines,
+    required this.direction,
+  });
+
+  final String label;
+  final List<String> lines;
+  final TextDirection direction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 16.h),
+        _SectionLabel(label),
+        SizedBox(height: 8.h),
+        for (var i = 0; i < lines.length; i++) ...[
+          if (i > 0) SizedBox(height: 10.h),
+          _NumberedLine(
+            number: '${i + 1}',
+            text: lines[i],
+            direction: direction,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _BulletSection extends StatelessWidget {
+  const _BulletSection({
+    required this.label,
+    required this.lines,
+    required this.direction,
+  });
+
+  final String label;
+  final List<String> lines;
+  final TextDirection direction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 16.h),
+        _SectionLabel(label),
+        SizedBox(height: 8.h),
+        for (var i = 0; i < lines.length; i++) ...[
+          if (i > 0) SizedBox(height: 8.h),
+          _NoteLine(text: lines[i], direction: direction),
+        ],
+      ],
     );
   }
 }

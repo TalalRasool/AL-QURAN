@@ -52,6 +52,51 @@ class WorshipL10n {
     'fa': 'مراحل',
   };
 
+  static const preparation = <String, String>{
+    'en': 'Preparation',
+    'ur': 'تیاری',
+    'hi': 'तैयारी',
+    'bn': 'প্রস্তুতি',
+    'id': 'Persiapan',
+    'fa': 'آمادگی',
+  };
+
+  static const detailedSteps = <String, String>{
+    'en': 'Step by step',
+    'ur': 'قدم بہ قدم',
+    'hi': 'क्रमवार तरीका',
+    'bn': 'ধাপে ধাপে',
+    'id': 'Langkah demi langkah',
+    'fa': 'گام به گام',
+  };
+
+  static const situations = <String, String>{
+    'en': 'Common situations',
+    'ur': 'عام صورتیں',
+    'hi': 'आम स्थितियाँ',
+    'bn': 'সাধারণ পরিস্থিতি',
+    'id': 'Situasi umum',
+    'fa': 'موقعیت‌های رایج',
+  };
+
+  static const mistakesToAvoid = <String, String>{
+    'en': 'Mistakes to avoid',
+    'ur': 'بچنے والی غلطیاں',
+    'hi': 'बचने वाली गलतियाँ',
+    'bn': 'এড়িয়ে চলার ভুল',
+    'id': 'Kesalahan yang dihindari',
+    'fa': 'اشتباه‌هایی که باید پرهیز کرد',
+  };
+
+  static const scopeNote = <String, String>{
+    'en': 'Note',
+    'ur': 'نوٹ',
+    'hi': 'नोट',
+    'bn': 'নোট',
+    'id': 'Catatan',
+    'fa': 'یادداشت',
+  };
+
   static const problems = <String, String>{
     'en': 'Common mistakes',
     'ur': 'عام غلطیاں',

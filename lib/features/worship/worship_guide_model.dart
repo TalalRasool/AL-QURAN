@@ -39,6 +39,7 @@ class WorshipGuideItem {
             : '',
         'steps': _stringList(block['steps']),
         'common_problems': _stringList(block['common_problems']),
+        'expanded_details': _expanded(block['expanded_details']),
       };
     }
 
@@ -62,6 +63,21 @@ class WorshipGuideItem {
 
   List<String> problemsFor(String languageCode) =>
       _list(languageCode, 'common_problems');
+
+  List<String> preparationFor(String languageCode) =>
+      _expandedList(languageCode, 'preparation');
+
+  List<String> detailedStepsFor(String languageCode) =>
+      _expandedList(languageCode, 'step_by_step');
+
+  List<String> situationsFor(String languageCode) =>
+      _expandedList(languageCode, 'common_situations');
+
+  List<String> mistakesToAvoidFor(String languageCode) =>
+      _expandedList(languageCode, 'mistakes_to_avoid');
+
+  String scopeNoteFor(String languageCode) =>
+      _string(_scopeNotes(), languageCode);
 
   Map<String, dynamic> _field(String field) {
     final values = <String, dynamic>{};
@@ -95,6 +111,46 @@ class WorshipGuideItem {
   List<String> _listAt(String languageCode, String field) {
     final block = asStringKeyMap(content[languageCode]);
     return _stringList(block[field]);
+  }
+
+  List<String> _expandedList(String languageCode, String field) {
+    final code = languageCode.trim().toLowerCase();
+    final direct = _expandedAt(code, field);
+    if (direct.isNotEmpty) return direct;
+    if (code != 'en') {
+      final english = _expandedAt('en', field);
+      if (english.isNotEmpty) return english;
+    }
+    return direct;
+  }
+
+  List<String> _expandedAt(String languageCode, String field) {
+    final block = asStringKeyMap(content[languageCode]);
+    final details = asStringKeyMap(block['expanded_details']);
+    return _stringList(details[field]);
+  }
+
+  Map<String, dynamic> _scopeNotes() {
+    final notes = <String, dynamic>{};
+    for (final entry in content.entries) {
+      final block = asStringKeyMap(entry.value);
+      final details = asStringKeyMap(block['expanded_details']);
+      final note = details['scope_note'];
+      notes[entry.key] = note is String ? note.trim() : '';
+    }
+    return notes;
+  }
+
+  static Map<String, dynamic> _expanded(dynamic value) {
+    final block = asStringKeyMap(value);
+    final note = block['scope_note'];
+    return {
+      'preparation': _stringList(block['preparation']),
+      'step_by_step': _stringList(block['step_by_step']),
+      'common_situations': _stringList(block['common_situations']),
+      'mistakes_to_avoid': _stringList(block['mistakes_to_avoid']),
+      'scope_note': note is String ? note.trim() : '',
+    };
   }
 
   static List<String> _stringList(dynamic value) {
