@@ -7,6 +7,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/controllers/settings_controller.dart';
 import '../../core/widgets/widgets.dart';
+import '../audio/ayah_play_button.dart';
 import 'offline_quran_controller.dart';
 import 'study_models.dart';
 
@@ -32,11 +33,12 @@ class QuranStudyScreen extends GetView<OfflineQuranController> {
             title: controller.title,
             onBack: reading ? controller.closeReader : null,
           ),
-          body: reading ? _ReaderBody(
-                    settings: settings,
-                    language: controller.languageCode.value,
-                    isRtl: controller.isRtl,
-                  )
+          body: reading
+              ? _ReaderBody(
+                  settings: settings,
+                  language: controller.languageCode.value,
+                  isRtl: controller.isRtl,
+                )
               : const _IndexBody(),
         ),
       );
@@ -129,9 +131,7 @@ class _JuzIndexList extends GetView<OfflineQuranController> {
       controller.searchQuery.value;
       final juzList = controller.filteredJuz;
       if (juzList.isEmpty) {
-        return Center(
-          child: Text('No juz found', style: AppTextStyles.body),
-        );
+        return Center(child: Text('No juz found', style: AppTextStyles.body));
       }
 
       return ListView.separated(
@@ -174,64 +174,66 @@ class _ReaderBody extends GetView<OfflineQuranController> {
       }
 
       if (controller.errorMessage.value != null && controller.ayahs.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                controller.errorMessage.value!,
-                style: AppTextStyles.body,
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 12.h),
-              TextButton(
-                onPressed: () {
-                  final juz = controller.selectedJuz.value;
-                  if (juz != null) {
-                    controller.loadJuz(juz);
-                  } else {
-                    controller.loadSurah(controller.selectedSurah.value);
-                  }
-                },
-                child: const Text('Retry'),
-              ),
-            ],
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  controller.errorMessage.value!,
+                  style: AppTextStyles.body,
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12.h),
+                TextButton(
+                  onPressed: () {
+                    final juz = controller.selectedJuz.value;
+                    if (juz != null) {
+                      controller.loadJuz(juz);
+                    } else {
+                      controller.loadSurah(controller.selectedSurah.value);
+                    }
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
           ),
+        );
+      }
+
+      return Directionality(
+        textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+        child: ListView.builder(
+          padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 28.h),
+          itemCount: controller.ayahs.length,
+          itemBuilder: (context, index) {
+            final ayah = controller.ayahs[index];
+            final showSurahHeader =
+                controller.isJuzReading &&
+                (index == 0 ||
+                    ayah.surahNumber !=
+                        controller.ayahs[index - 1].surahNumber);
+            return Column(
+              children: [
+                if (showSurahHeader)
+                  _SurahHeader(
+                    number: ayah.surahNumber,
+                    name: controller.surahName(ayah.surahNumber),
+                  ),
+                _AyahCard(
+                  ayah: ayah,
+                  language: language,
+                  isRtl: isRtl,
+                  settings: settings,
+                  surahName: controller.surahName(ayah.surahNumber),
+                ),
+              ],
+            );
+          },
         ),
       );
-    }
-
-    return Directionality(
-      textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-      child: ListView.builder(
-        padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 28.h),
-        itemCount: controller.ayahs.length,
-        itemBuilder: (context, index) {
-          final ayah = controller.ayahs[index];
-          final showSurahHeader = controller.isJuzReading &&
-              (index == 0 ||
-                  ayah.surahNumber !=
-                      controller.ayahs[index - 1].surahNumber);
-          return Column(
-            children: [
-              if (showSurahHeader)
-                _SurahHeader(
-                  number: ayah.surahNumber,
-                  name: controller.surahName(ayah.surahNumber),
-                ),
-              _AyahCard(
-                ayah: ayah,
-                language: language,
-                isRtl: isRtl,
-                settings: settings,
-              ),
-            ],
-          );
-        },
-      ),
-    );
     });
   }
 }
@@ -261,26 +263,25 @@ class _AyahCard extends StatelessWidget {
     required this.language,
     required this.isRtl,
     required this.settings,
+    required this.surahName,
   });
 
   final OfflineAyah ayah;
   final String language;
   final bool isRtl;
   final SettingsController settings;
+  final String surahName;
 
   @override
   Widget build(BuildContext context) {
-    final arabicStyle = settings.arabicStyle(height: 1.7).copyWith(
-          fontSize: 26.sp,
-          fontWeight: FontWeight.w600,
-        );
+    final arabicStyle = settings
+        .arabicStyle(height: 1.7)
+        .copyWith(fontSize: 26.sp, fontWeight: FontWeight.w600);
     final wordStyle = settings
         .translationStyle(color: AppColors.primarySoft, height: 1.7)
         .copyWith(fontSize: 12.sp);
     final fullStyle = settings.translationStyle(height: 2.0);
     final translation = ayah.fullTextFor(language);
-    final badgeAlignment =
-        isRtl ? Alignment.centerRight : Alignment.centerLeft;
 
     return Container(
       width: double.infinity,
@@ -294,20 +295,27 @@ class _AyahCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: badgeAlignment,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: AppColors.mint,
-                borderRadius: BorderRadius.circular(20.r),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.mint,
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  '${OfflineLanguage.ayahLabel(language)} ${ayah.ayahNumber}',
+                  textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+                  style: _badgeStyle(language),
+                ),
               ),
-              child: Text(
-                '${OfflineLanguage.ayahLabel(language)} ${ayah.ayahNumber}',
-                textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-                style: _badgeStyle(language),
+              const Spacer(),
+              AyahPlayButton(
+                surahNumber: ayah.surahNumber,
+                ayahNumber: ayah.ayahNumber,
+                surahName: surahName,
               ),
-            ),
+            ],
           ),
           SizedBox(height: 14.h),
           Wrap(

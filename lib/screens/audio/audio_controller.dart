@@ -24,7 +24,8 @@ class AudioController extends GetxController {
     isLoading.value = true;
     errorMessage.value = null;
     try {
-      reciters.assignAll(await _quran.getReciters());
+      final loaded = await _quran.getReciters();
+      reciters.assignAll(loaded.take(20).toList());
     } catch (_) {
       errorMessage.value =
           'Unable to load reciters. Check your connection and try again.';

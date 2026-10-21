@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -105,6 +106,17 @@ class ProfileScreen extends GetView<ProfileController> {
                   onTap: () => Get.toNamed(AppRoutes.hifzTester),
                 ),
                 _SettingsTile(
+                  icon: Icons.download_done_rounded,
+                  title: 'Downloaded Audios',
+                  value: 'میری ڈاؤن لوڈز',
+                  valueStyle: GoogleFonts.notoNastaliqUrdu(
+                    fontSize: 14.sp,
+                    color: AppColors.primaryLight,
+                    height: 1.6,
+                  ),
+                  onTap: () => Get.toNamed(AppRoutes.downloadedAudio),
+                ),
+                _SettingsTile(
                   icon: Icons.bookmark_border_rounded,
                   title: 'Bookmarks',
                   onTap: () => Get.toNamed(AppRoutes.bookmarks),
@@ -181,10 +193,7 @@ class _ProfileHeader extends GetView<ProfileController> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.white.withValues(alpha: 0.16),
-                      border: Border.all(
-                        color: AppColors.white,
-                        width: 3.w,
-                      ),
+                      border: Border.all(color: AppColors.white, width: 3.w),
                     ),
                     child: Icon(
                       Icons.person_rounded,
@@ -275,10 +284,7 @@ class _DataBackupCard extends GetView<ProfileController> {
             ),
             SizedBox(height: 14.h),
             if (loggedIn)
-              PrimaryButton(
-                label: 'Sign Out',
-                onPressed: controller.signOut,
-              )
+              PrimaryButton(label: 'Sign Out', onPressed: controller.signOut)
             else
               PrimaryButton(
                 label: 'Sign In / Sign Up',
@@ -316,6 +322,7 @@ class _SettingsTile extends StatelessWidget {
     required this.icon,
     required this.title,
     this.value,
+    this.valueStyle,
     this.trailing,
     this.onTap,
   });
@@ -323,6 +330,7 @@ class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? value;
+  final TextStyle? valueStyle;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -368,12 +376,14 @@ class _SettingsTile extends StatelessWidget {
                       Flexible(
                         child: Text(
                           value!,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.isDark
-                                ? AppColors.textSecondary
-                                : AppColors.primaryLight,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style:
+                              valueStyle ??
+                              AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.isDark
+                                    ? AppColors.textSecondary
+                                    : AppColors.primaryLight,
+                                fontWeight: FontWeight.w600,
+                              ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.end,

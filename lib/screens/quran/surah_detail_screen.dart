@@ -9,6 +9,7 @@ import '../../core/controllers/bookmark_controller.dart';
 import '../../core/controllers/quran_audio_controller.dart';
 import '../../core/controllers/settings_controller.dart';
 import '../../core/widgets/widgets.dart';
+import '../audio/ayah_play_button.dart';
 import '../audio/quran_audio_actions.dart';
 import '../audio/quran_bottom_player.dart';
 import 'surah_detail_controller.dart';
@@ -34,8 +35,8 @@ class SurahDetailScreen extends GetView<SurahDetailController> {
               bookmarks.items.length;
               final number = controller.surah.value?.number ?? 0;
               return BookmarkIconButton(
-                isBookmarked: number > 0 &&
-                    bookmarks.isTranslationBookmarked(number),
+                isBookmarked:
+                    number > 0 && bookmarks.isTranslationBookmarked(number),
                 onPressed: controller.toggleBookmark,
               );
             }),
@@ -113,7 +114,8 @@ class SurahDetailScreen extends GetView<SurahDetailController> {
           itemCount: controller.ayahs.length,
           itemBuilder: (context, index) {
             final ayah = controller.ayahs[index];
-            final showHeader = controller.isJuzMode &&
+            final showHeader =
+                controller.isJuzMode &&
                 ayah.surahNumber > 0 &&
                 (index == 0 ||
                     controller.ayahs[index - 1].surahNumber !=
@@ -139,6 +141,12 @@ class SurahDetailScreen extends GetView<SurahDetailController> {
                 _AyahCard(
                   ayahId: controller.hifzIdFor(ayah),
                   number: ayah.number,
+                  surahNumber: ayah.surahNumber > 0
+                      ? ayah.surahNumber
+                      : controller.playbackSurahNumber,
+                  surahName: ayah.surahEnglishName.isNotEmpty
+                      ? ayah.surahEnglishName
+                      : controller.playbackSurahName,
                   arabic: ayah.arabic,
                   translation: ayah.translation,
                   isHighlighted: controller.isHighlighted(ayah),
@@ -208,6 +216,8 @@ class _AyahCard extends GetView<SurahDetailController> {
   const _AyahCard({
     required this.ayahId,
     required this.number,
+    required this.surahNumber,
+    required this.surahName,
     required this.arabic,
     required this.translation,
     required this.isHighlighted,
@@ -216,6 +226,8 @@ class _AyahCard extends GetView<SurahDetailController> {
 
   final int ayahId;
   final int number;
+  final int surahNumber;
+  final String surahName;
   final String arabic;
   final String translation;
   final bool isHighlighted;
@@ -254,29 +266,36 @@ class _AyahCard extends GetView<SurahDetailController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      width: 28.w,
-                      height: 28.w,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: FittedBox(
-                        child: Padding(
-                          padding: EdgeInsets.all(4.w),
-                          child: Text(
-                            '$number',
-                            style: AppTextStyles.caption.copyWith(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      Container(
+                        width: 28.w,
+                        height: 28.w,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: FittedBox(
+                          child: Padding(
+                            padding: EdgeInsets.all(4.w),
+                            child: Text(
+                              '$number',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                      const Spacer(),
+                      AyahPlayButton(
+                        surahNumber: surahNumber,
+                        ayahNumber: number,
+                        surahName: surahName,
+                      ),
+                    ],
                   ),
                   SizedBox(height: 10.h),
                   HifzAyahText(
@@ -293,8 +312,9 @@ class _AyahCard extends GetView<SurahDetailController> {
                     Text(
                       translation,
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                      textDirection:
-                          isRtl ? TextDirection.rtl : TextDirection.ltr,
+                      textDirection: isRtl
+                          ? TextDirection.rtl
+                          : TextDirection.ltr,
                       style: settings.translationStyle(
                         color: AppColors.textSecondary,
                       ),
