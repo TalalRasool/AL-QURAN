@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:alquran/features/hadith/data/hadith_editions.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 const _outputPath = 'assets/databases/hadith.db';
@@ -24,6 +25,12 @@ Future<void> main() async {
   if (dbFile.existsSync()) {
     await dbFile.delete();
   }
+
+  final translationSpecs = HadithEditions.translations;
+  final textColumns = [
+    HadithEditions.textArColumn,
+    for (final spec in translationSpecs) spec.column!,
+  ];
 
   stdout.writeln('Creating $_outputPath ...');
   final db = sqlite3.open(_outputPath);
@@ -51,9 +58,7 @@ Future<void> main() async {
         book_id INTEGER NOT NULL,
         chapter_id INTEGER NOT NULL,
         hadith_number REAL NOT NULL,
-        text_ar TEXT NOT NULL DEFAULT '',
-        text_en TEXT NOT NULL DEFAULT '',
-        text_ur TEXT NOT NULL DEFAULT '',
+        ${textColumns.map((column) => '$column TEXT NOT NULL DEFAULT \'\'').join(',\n        ')},
         FOREIGN KEY (book_id) REFERENCES books (id),
         FOREIGN KEY (chapter_id) REFERENCES chapters (id)
       );
@@ -71,34 +76,46 @@ Future<void> main() async {
     final insertChapter = db.prepare(
       'INSERT INTO chapters (book_id, number, name) VALUES (?, ?, ?);',
     );
+    final placeholders = List.filled(3 + textColumns.length, '?').join(', ');
     final insertHadith = db.prepare('''
       INSERT INTO ahadith
-        (book_id, chapter_id, hadith_number, text_ar, text_en, text_ur)
-      VALUES (?, ?, ?, ?, ?, ?);
+        (book_id, chapter_id, hadith_number, ${textColumns.join(', ')})
+      VALUES ($placeholders);
     ''');
 
     try {
       for (final book in _books) {
         stdout.writeln('Processing ${book.name}...');
-        final arabic = _loadEdition(_path('ara', book.slug));
-        final english = _loadEdition(_path('eng', book.slug));
-        final urdu = _loadEdition(_path('urd', book.slug));
-        if (arabic == null && english == null && urdu == null) {
-          stderr.writeln('Skipping ${book.slug}: no JSON editions found.');
+        final editions = <String, Map<String, dynamic>?>{};
+        for (final spec in HadithEditions.specs) {
+          editions[spec.appCode] = _loadEdition(
+            _editionPath(spec, book.slug),
+            optional: !spec.required,
+            label: '${spec.label} ${book.name}',
+          );
+        }
+        if (editions['ar'] == null && editions['en'] == null) {
+          stderr.writeln('Skipping ${book.slug}: Arabic and English are missing.');
           continue;
         }
 
         insertBook.execute([book.id, book.name]);
 
-        final chapters = _chapterNames(english, arabic, urdu);
+        final chapters = _chapterNames(
+          editions['en'],
+          editions['ar'],
+          editions['ur'],
+        );
         final chapterDbIds = <int, int>{};
         for (final chapter in chapters) {
           insertChapter.execute([book.id, chapter.number, chapter.name]);
           chapterDbIds[chapter.number] = db.lastInsertRowId;
         }
 
-        final hadiths = _mergeHadiths(arabic, english, urdu);
-        var inserted = 0;
+        final hadiths = _mergeHadiths(editions);
+        final filled = <String, int>{
+          for (final spec in HadithEditions.specs) spec.appCode: 0,
+        };
         for (final hadith in hadiths) {
           var chapterDbId = chapterDbIds[hadith.chapterNumber];
           if (chapterDbId == null) {
@@ -110,18 +127,25 @@ Future<void> main() async {
             chapterDbId = db.lastInsertRowId;
             chapterDbIds[hadith.chapterNumber] = chapterDbId;
           }
+          for (final spec in HadithEditions.specs) {
+            if ((hadith.texts[spec.appCode] ?? '').isNotEmpty) {
+              filled[spec.appCode] = filled[spec.appCode]! + 1;
+            }
+          }
           insertHadith.execute([
             book.id,
             chapterDbId,
             hadith.number,
-            hadith.textAr,
-            hadith.textEn,
-            hadith.textUr,
+            for (final spec in HadithEditions.specs)
+              hadith.texts[spec.appCode] ?? '',
           ]);
-          inserted++;
         }
+        final counts = [
+          for (final spec in HadithEditions.specs)
+            '${spec.appCode}=${filled[spec.appCode]}',
+        ].join(', ');
         stdout.writeln(
-          '  ${chapters.length} chapters, $inserted ahadith.',
+          '  ${chapterDbIds.length} chapters, ${hadiths.length} ahadith ($counts).',
         );
       }
     } finally {
@@ -131,12 +155,15 @@ Future<void> main() async {
     }
 
     db.execute('COMMIT;');
-  } catch (error) {
+    stdout.writeln('Compacting database...');
+    db.execute('VACUUM;');
+  } catch (error, stack) {
     try {
       db.execute('ROLLBACK;');
     } catch (_) {}
     db.dispose();
     stderr.writeln('Failed to generate Hadith database: $error');
+    stderr.writeln('$stack');
     exit(1);
   }
 
@@ -145,17 +172,30 @@ Future<void> main() async {
   stdout.writeln('Saved $_outputPath ($sizeMb MB) successfully!');
 }
 
-String _path(String language, String slug) =>
-    'assets/json/$language-$slug.json';
+String? _editionPath(HadithEditionSpec spec, String slug) {
+  final name = spec.fileName(slug);
+  final bundled = File('assets/json/$name');
+  if (bundled.existsSync()) return bundled.path;
+  final downloaded = File('tool/hadith_editions/$name');
+  if (downloaded.existsSync()) return downloaded.path;
+  return null;
+}
 
-Map<String, dynamic>? _loadEdition(String path) {
-  final file = File(path);
-  if (!file.existsSync()) {
-    stderr.writeln('Missing $path');
-    return null;
+Map<String, dynamic>? _loadEdition(
+  String? path, {
+  required bool optional,
+  required String label,
+}) {
+  if (path == null) {
+    final message = 'No edition file for $label.';
+    if (optional) {
+      stdout.writeln('  $message English fallback will be used.');
+      return null;
+    }
+    throw StateError(message);
   }
-  stdout.writeln('Loading $path ...');
-  return jsonDecode(file.readAsStringSync(encoding: utf8))
+  stdout.writeln('  Loading $path ...');
+  return jsonDecode(File(path).readAsStringSync(encoding: utf8))
       as Map<String, dynamic>;
 }
 
@@ -211,20 +251,14 @@ String _chapterTitle(int id, String? english, String? arabic, String? urdu) {
   return id == 0 ? 'Introduction' : 'Chapter $id';
 }
 
-List<_HadithRow> _mergeHadiths(
-  Map<String, dynamic>? arabic,
-  Map<String, dynamic>? english,
-  Map<String, dynamic>? urdu,
-) {
+List<_HadithRow> _mergeHadiths(Map<String, Map<String, dynamic>?> editions) {
   final merged = <num, _HadithRow>{};
 
-  void apply(
-    Map<String, dynamic>? root,
-    void Function(_HadithRow, String) setText,
-  ) {
-    if (root == null) return;
+  for (final spec in HadithEditions.specs) {
+    final root = editions[spec.appCode];
+    if (root == null) continue;
     final list = root['hadiths'];
-    if (list is! List) return;
+    if (list is! List) continue;
     for (final item in list) {
       if (item is! Map) continue;
       final number = item['hadithnumber'];
@@ -238,13 +272,12 @@ List<_HadithRow> _mergeHadiths(
         number,
         () => _HadithRow(number: number, chapterNumber: chapterNumber),
       );
-      setText(row, text);
+      if (row.chapterNumber == 0 && chapterNumber != 0) {
+        row.chapterNumber = chapterNumber;
+      }
+      if (text.isNotEmpty) row.texts[spec.appCode] = text;
     }
   }
-
-  apply(arabic, (row, text) => row.textAr = text);
-  apply(english, (row, text) => row.textEn = text);
-  apply(urdu, (row, text) => row.textUr = text);
 
   final rows = merged.values.toList()
     ..sort((a, b) {
@@ -266,8 +299,6 @@ class _HadithRow {
   _HadithRow({required this.number, required this.chapterNumber});
 
   final num number;
-  final int chapterNumber;
-  String textAr = '';
-  String textEn = '';
-  String textUr = '';
+  int chapterNumber;
+  final texts = <String, String>{};
 }
