@@ -10,8 +10,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'quran_audio_store.dart';
 
 class AudioService extends GetxService {
-  static const _cdnBase =
+  static const _surahCdnBase =
       'https://cdn.islamic.network/quran/audio-surah/128';
+  static const _ayahCdnBase = 'https://cdn.islamic.network/quran/audio/128';
 
   AudioPlayer? _player;
   final _subscriptions = <StreamSubscription<dynamic>>[];
@@ -23,6 +24,7 @@ class AudioService extends GetxService {
   final totalDuration = Duration.zero.obs;
   final bufferedPosition = Duration.zero.obs;
   final currentSurahNumber = 0.obs;
+  final currentAyahNumber = 0.obs;
   final currentSurahName = ''.obs;
   final currentReciterId = ''.obs;
   final currentReciterName = ''.obs;
@@ -80,7 +82,11 @@ class AudioService extends GetxService {
   }
 
   String audioUrl(int surahNumber, String reciterIdentifier) {
-    return '$_cdnBase/$reciterIdentifier/$surahNumber.mp3';
+    return '$_surahCdnBase/$reciterIdentifier/$surahNumber.mp3';
+  }
+
+  String ayahAudioUrl(int globalAyahNumber, String reciterIdentifier) {
+    return '$_ayahCdnBase/$reciterIdentifier/$globalAyahNumber.mp3';
   }
 
   Future<void> playSurah(
@@ -91,6 +97,7 @@ class AudioService extends GetxService {
   }) async {
     isLoading.value = true;
     currentSurahNumber.value = surahNumber;
+    currentAyahNumber.value = 0;
     currentReciterId.value = reciterIdentifier;
     if (reciterName != null && reciterName.isNotEmpty) {
       currentReciterName.value = reciterName;
@@ -106,28 +113,27 @@ class AudioService extends GetxService {
         reciterIdentifier,
         surahNumber,
       );
-      final Uri uri;
-      if (await QuranAudioStore.isComplete(local)) {
-        uri = Uri.file(local.path);
-      } else {
-        uri = Uri.parse(audioUrl(surahNumber, reciterIdentifier));
-      }
       final artist = currentReciterName.value.trim().isEmpty
           ? 'Qari'
           : currentReciterName.value.trim();
-      await _audio.stop();
-      await _audio.setAudioSource(
-        AudioSource.uri(
-          uri,
-          tag: MediaItem(
-            id: '$reciterIdentifier:$surahNumber',
-            album: 'Al Quran',
-            title: title,
-            artist: artist,
-            artUri: await QuranAudioStore.artworkUri(),
-          ),
-        ),
+      final tag = MediaItem(
+        id: '$reciterIdentifier:$surahNumber',
+        album: 'Al Quran',
+        title: title,
+        artist: artist,
+        artUri: await QuranAudioStore.artworkUri(),
       );
+      await _audio.stop();
+      final onlineUrl = audioUrl(surahNumber, reciterIdentifier);
+      if (await File(local.path).exists()) {
+        try {
+          await _audio.setFilePath(local.path, tag: tag);
+        } catch (_) {
+          await _audio.setUrl(onlineUrl, tag: tag);
+        }
+      } else {
+        await _audio.setUrl(onlineUrl, tag: tag);
+      }
       hasActiveAudio.value = true;
       await _audio.play();
     } catch (_) {
@@ -142,9 +148,7 @@ class AudioService extends GetxService {
     try {
       if (kIsWeb || !Platform.isAndroid) return;
       final status = await Permission.notification.status;
-      if (status.isGranted ||
-          status.isLimited ||
-          status.isPermanentlyDenied) {
+      if (status.isGranted || status.isLimited || status.isPermanentlyDenied) {
         return;
       }
       await Permission.notification.request();
@@ -191,13 +195,147 @@ class AudioService extends GetxService {
     await seek(Duration(milliseconds: (fraction * total).round()));
   }
 
+  Future<void> playAyah({
+    required int surahNumber,
+    required int ayahNumber,
+    required int globalAyahNumber,
+    required String reciterIdentifier,
+    String? reciterName,
+    String? surahName,
+  }) async {
+    isLoading.value = true;
+    currentSurahNumber.value = surahNumber;
+    currentAyahNumber.value = ayahNumber;
+    currentReciterId.value = reciterIdentifier;
+    if (reciterName != null && reciterName.isNotEmpty) {
+      currentReciterName.value = reciterName;
+    }
+    final surahTitle = (surahName == null || surahName.trim().isEmpty)
+        ? 'Surah $surahNumber'
+        : surahName.trim();
+    currentSurahName.value = '$surahTitle · Ayah $ayahNumber';
+
+    try {
+      await _requestNotificationPermission();
+      final local = await QuranAudioStore.ayahFile(
+        reciterIdentifier,
+        globalAyahNumber,
+      );
+      final artist = currentReciterName.value.trim().isEmpty
+          ? 'Qari'
+          : currentReciterName.value.trim();
+      final tag = MediaItem(
+        id: '$reciterIdentifier:$surahNumber:$ayahNumber',
+        album: 'Al Quran',
+        title: currentSurahName.value,
+        artist: artist,
+        artUri: await QuranAudioStore.artworkUri(),
+      );
+      final onlineUrl = ayahAudioUrl(globalAyahNumber, reciterIdentifier);
+      await _audio.stop();
+      if (await File(local.path).exists()) {
+        try {
+          await _audio.setFilePath(local.path, tag: tag);
+        } catch (_) {
+          await _audio.setUrl(onlineUrl, tag: tag);
+        }
+      } else {
+        await _audio.setUrl(onlineUrl, tag: tag);
+      }
+      hasActiveAudio.value = true;
+      await _audio.play();
+    } catch (_) {
+      isPlaying.value = false;
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> playLocalSurahFile({
+    required File file,
+    required int surahNumber,
+    required String reciterIdentifier,
+    String? reciterName,
+    String? surahName,
+  }) async {
+    isLoading.value = true;
+    currentSurahNumber.value = surahNumber;
+    currentAyahNumber.value = 0;
+    currentReciterId.value = reciterIdentifier;
+    if (reciterName != null && reciterName.isNotEmpty) {
+      currentReciterName.value = reciterName;
+    }
+    final title = (surahName == null || surahName.trim().isEmpty)
+        ? 'Surah $surahNumber'
+        : surahName.trim();
+    currentSurahName.value = title;
+    try {
+      await _requestNotificationPermission();
+      final artist = currentReciterName.value.trim().isEmpty
+          ? 'Qari'
+          : currentReciterName.value.trim();
+      await _audio.stop();
+      await _audio.setFilePath(
+        file.path,
+        tag: MediaItem(
+          id: '$reciterIdentifier:$surahNumber',
+          album: 'Al Quran',
+          title: title,
+          artist: artist,
+          artUri: await QuranAudioStore.artworkUri(),
+        ),
+      );
+      hasActiveAudio.value = true;
+      await _audio.play();
+    } catch (_) {
+      isPlaying.value = false;
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> toggleAyah({
+    required int surahNumber,
+    required int ayahNumber,
+    required int globalAyahNumber,
+    required String reciterIdentifier,
+    String? reciterName,
+    String? surahName,
+  }) async {
+    final isSameAyah =
+        currentSurahNumber.value == surahNumber &&
+        currentAyahNumber.value == ayahNumber &&
+        currentReciterId.value == reciterIdentifier &&
+        hasActiveAudio.value;
+    if (isSameAyah && isPlaying.value) {
+      await pause();
+      return;
+    }
+    if (isSameAyah && !isPlaying.value) {
+      await resume();
+      return;
+    }
+    await playAyah(
+      surahNumber: surahNumber,
+      ayahNumber: ayahNumber,
+      globalAyahNumber: globalAyahNumber,
+      reciterIdentifier: reciterIdentifier,
+      reciterName: reciterName,
+      surahName: surahName,
+    );
+  }
+
   Future<void> togglePlay({
     required int surahNumber,
     required String reciterIdentifier,
     String? reciterName,
     String? surahName,
   }) async {
-    final isSameTrack = currentSurahNumber.value == surahNumber &&
+    final isSameTrack =
+        currentSurahNumber.value == surahNumber &&
+        currentAyahNumber.value == 0 &&
         currentReciterId.value == reciterIdentifier &&
         hasActiveAudio.value;
 

@@ -6,6 +6,23 @@ import 'package:path_provider/path_provider.dart';
 
 import '../constants/app_assets.dart';
 
+class LocalSurahAudio {
+  const LocalSurahAudio({
+    required this.file,
+    required this.reciterId,
+    required this.surahNumber,
+    required this.bytes,
+  });
+
+  final File file;
+  final String reciterId;
+  final int surahNumber;
+  final int bytes;
+
+  String get sizeLabel =>
+      '${QuranAudioStore.megabytes(bytes).toStringAsFixed(1)} MB';
+}
+
 /// Local recitation files and the progress labels shown while they download.
 class QuranAudioStore {
   QuranAudioStore._();
@@ -37,7 +54,10 @@ class QuranAudioStore {
   }
 
   static String safeReciterId(String reciterId) {
-    final cleaned = reciterId.trim().replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+    final cleaned = reciterId.trim().replaceAll(
+      RegExp(r'[^A-Za-z0-9._-]'),
+      '_',
+    );
     return cleaned.isEmpty ? 'reciter' : cleaned;
   }
 
@@ -54,6 +74,48 @@ class QuranAudioStore {
     final directory = await audioDirectory();
     final name = '${safeReciterId(reciterId)}/$surahNumber.mp3';
     return File(p.join(directory.path, name));
+  }
+
+  static Future<File> ayahFile(String reciterId, int globalAyahNumber) async {
+    final directory = await audioDirectory();
+    final name = '${safeReciterId(reciterId)}/ayahs/$globalAyahNumber.mp3';
+    return File(p.join(directory.path, name));
+  }
+
+  /// Saved surah recitations, one file per reciter and surah number.
+  static Future<List<LocalSurahAudio>> listSurahFiles() async {
+    final directory = await audioDirectory();
+    if (!await directory.exists()) return const [];
+    final files = <LocalSurahAudio>[];
+    await for (final reciterDir in directory.list(followLinks: false)) {
+      if (reciterDir is! Directory) continue;
+      final reciterId = p.basename(reciterDir.path);
+      await for (final entity in reciterDir.list(followLinks: false)) {
+        if (entity is! File) continue;
+        final name = p.basename(entity.path);
+        if (!name.toLowerCase().endsWith('.mp3')) continue;
+        final surahNumber = int.tryParse(p.basenameWithoutExtension(name));
+        if (surahNumber == null || surahNumber < 1 || surahNumber > 114) {
+          continue;
+        }
+        final bytes = await entity.length();
+        if (bytes <= 1024) continue;
+        files.add(
+          LocalSurahAudio(
+            file: entity,
+            reciterId: reciterId,
+            surahNumber: surahNumber,
+            bytes: bytes,
+          ),
+        );
+      }
+    }
+    files.sort((a, b) {
+      final bySurah = a.surahNumber.compareTo(b.surahNumber);
+      if (bySurah != 0) return bySurah;
+      return a.reciterId.compareTo(b.reciterId);
+    });
+    return files;
   }
 
   static Future<bool> isComplete(File file) async {

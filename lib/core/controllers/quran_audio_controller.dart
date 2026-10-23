@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../screens/audio/quran_download_sheet.dart';
+import '../data/quran_ayah_index.dart';
 import '../services/audio_service.dart';
 import '../services/quran_audio_store.dart';
 import '../services/storage_service.dart';
@@ -69,21 +70,48 @@ class QuranAudioController extends GetxController {
     return QuranAudioStore.percentLabel(downloadPercent.value);
   }
 
-  String get sizeLabel => QuranAudioStore.sizeLabelFromBytes(
-        receivedBytes.value,
-        totalBytes.value,
-      );
+  String get sizeLabel =>
+      QuranAudioStore.sizeLabelFromBytes(receivedBytes.value, totalBytes.value);
 
   bool isCurrentTrack(int surahNumber) {
     if (surahNumber < 1 || !_audio.hasActiveAudio.value) return false;
-    return _audio.currentSurahNumber.value == surahNumber &&
+    return _audio.currentAyahNumber.value == 0 &&
+        _audio.currentSurahNumber.value == surahNumber &&
+        _audio.currentReciterId.value == _storage.selectedReciterId.value;
+  }
+
+  bool isAyahPlaying(int surahNumber, int ayahNumber) {
+    if (surahNumber < 1 || ayahNumber < 1) return false;
+    return _audio.isPlaying.value &&
+        _audio.currentAyahNumber.value == ayahNumber &&
+        _audio.currentSurahNumber.value == surahNumber &&
+        _audio.currentReciterId.value == _storage.selectedReciterId.value;
+  }
+
+  bool isPlayingDownloaded({
+    required int surahNumber,
+    required String reciterId,
+  }) {
+    return isPlaying &&
+        _audio.currentAyahNumber.value == 0 &&
+        _audio.currentSurahNumber.value == surahNumber &&
+        _audio.currentReciterId.value == reciterId;
+  }
+
+  bool isAyahLoading(int surahNumber, int ayahNumber) {
+    if (surahNumber < 1 || ayahNumber < 1) return false;
+    return _audio.isLoading.value &&
+        _audio.currentAyahNumber.value == ayahNumber &&
+        _audio.currentSurahNumber.value == surahNumber &&
         _audio.currentReciterId.value == _storage.selectedReciterId.value;
   }
 
   bool isDownloaded(int surahNumber) {
     downloadRevision.value;
     if (surahNumber < 1) return false;
-    return _downloaded.contains(_key(_storage.selectedReciterId.value, surahNumber));
+    return _downloaded.contains(
+      _key(_storage.selectedReciterId.value, surahNumber),
+    );
   }
 
   bool isDownloadingSurah(int surahNumber) {
@@ -96,7 +124,11 @@ class QuranAudioController extends GetxController {
     if (surahNumber < 1) return;
     final reciterId = _storage.selectedReciterId.value;
     final file = await QuranAudioStore.surahFile(reciterId, surahNumber);
-    _markDownloaded(reciterId, surahNumber, await QuranAudioStore.isComplete(file));
+    _markDownloaded(
+      reciterId,
+      surahNumber,
+      await QuranAudioStore.isComplete(file),
+    );
   }
 
   Future<void> playOrToggle({
@@ -114,6 +146,79 @@ class QuranAudioController extends GetxController {
     } catch (_) {
       Get.snackbar('Audio', 'Unable to play this surah right now.');
     }
+  }
+
+  Future<void> playOrToggleAyah({
+    required int surahNumber,
+    required int ayahNumber,
+    required String surahName,
+  }) async {
+    final globalNumber = QuranAyahIndex.globalNumber(surahNumber, ayahNumber);
+    if (globalNumber < 1) return;
+    try {
+      await _audio.toggleAyah(
+        surahNumber: surahNumber,
+        ayahNumber: ayahNumber,
+        globalAyahNumber: globalNumber,
+        reciterIdentifier: _storage.selectedReciterId.value,
+        reciterName: _storage.selectedReciterName.value,
+        surahName: surahName,
+      );
+    } catch (_) {
+      Get.snackbar('Audio', 'Unable to play this ayah right now.');
+    }
+  }
+
+  Future<void> playDownloadedSurah({
+    required File file,
+    required int surahNumber,
+    required String reciterId,
+    required String surahName,
+    String? reciterName,
+  }) async {
+    if (!await file.exists()) {
+      Get.snackbar('Audio', 'This download is no longer on the device.');
+      return;
+    }
+    final sameTrack =
+        _audio.hasActiveAudio.value &&
+        _audio.currentAyahNumber.value == 0 &&
+        _audio.currentSurahNumber.value == surahNumber &&
+        _audio.currentReciterId.value == reciterId;
+    try {
+      if (sameTrack && _audio.isPlaying.value) {
+        await _audio.pause();
+        return;
+      }
+      if (sameTrack && !_audio.isPlaying.value) {
+        await _audio.resume();
+        return;
+      }
+      await _audio.playLocalSurahFile(
+        file: file,
+        surahNumber: surahNumber,
+        reciterIdentifier: reciterId,
+        reciterName: reciterName ?? reciterId,
+        surahName: surahName,
+      );
+    } catch (_) {
+      Get.snackbar('Audio', 'Unable to play this download right now.');
+    }
+  }
+
+  Future<void> deleteDownloadedSurah({
+    required File file,
+    required int surahNumber,
+    required String reciterId,
+  }) async {
+    final playing =
+        _audio.hasActiveAudio.value &&
+        _audio.currentAyahNumber.value == 0 &&
+        _audio.currentSurahNumber.value == surahNumber &&
+        _audio.currentReciterId.value == reciterId;
+    if (playing) await _audio.stop();
+    if (await file.exists()) await file.delete();
+    _markDownloaded(reciterId, surahNumber, false);
   }
 
   Future<void> toggleCurrent() async {
@@ -154,7 +259,8 @@ class QuranAudioController extends GetxController {
     downloadReciterName.value = reciterName;
     downloadError.value = null;
 
-    final sameActiveJob = isDownloading.value &&
+    final sameActiveJob =
+        isDownloading.value &&
         _activeReciterId == reciterId &&
         _activeSurahNumber == surahNumber;
     if (sameActiveJob) {
@@ -174,10 +280,7 @@ class QuranAudioController extends GetxController {
     receivedBytes.value = 0;
     totalBytes.value = 0;
     _presentSheet();
-    await _runDownload(
-      surahNumber: surahNumber,
-      reciterId: reciterId,
-    );
+    await _runDownload(surahNumber: surahNumber, reciterId: reciterId);
   }
 
   Future<void> cancelDownload() async {
